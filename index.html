@@ -8,6 +8,9 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4A9FF5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="提升计划">
@@ -704,14 +707,22 @@
         }
 
         .calendar-day {
-            aspect-ratio: 1;
+            aspect-ratio: auto;
+            min-height: 60px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            padding: 4px;
             font-size: 14px;
             border-radius: var(--radius-sm);
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
+        }
+
+        .calendar-day-num {
+            font-weight: 500;
+            margin-bottom: 2px;
         }
 
         .calendar-day:hover {
@@ -723,6 +734,10 @@
             color: white;
         }
 
+        .calendar-day.today .calendar-course-tag {
+            background: rgba(255,255,255,0.3);
+        }
+
         .calendar-day.has-task::after {
             content: '';
             width: 6px;
@@ -730,11 +745,217 @@
             background: var(--secondary);
             border-radius: 50%;
             position: absolute;
-            bottom: 4px;
+            top: 4px;
+            right: 4px;
         }
 
         .calendar-day.empty {
             cursor: default;
+        }
+
+        .calendar-course-tags {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 100%;
+        }
+
+        .calendar-course-tag {
+            font-size: 9px;
+            padding: 2px 4px;
+            background: rgba(255, 107, 107, 0.85);
+            color: white;
+            border-radius: 4px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calendar-course-tag:hover {
+            transform: scale(1.02);
+            background: rgba(255, 107, 107, 1);
+        }
+
+        .calendar-course-tag.completed {
+            background: rgba(255, 107, 107, 0.35);
+            text-decoration: line-through;
+        }
+
+        .calendar-course-tag.completed::after {
+            content: ' ✓';
+            font-weight: bold;
+        }
+
+        /* 课程详情样式 */
+        .course-detail-info {
+            margin-bottom: 20px;
+        }
+
+        .course-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .course-detail-label {
+            color: var(--text-secondary);
+        }
+
+        .course-mindmaps {
+            margin-top: 20px;
+        }
+
+        .course-mindmaps h4 {
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .mindmap-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .mindmap-thumb {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .mindmap-thumb:hover {
+            transform: scale(1.05);
+        }
+
+        .mindmap-preview {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: var(--radius);
+        }
+
+        /* 课程进度统计样式 */
+        .course-stats-overview {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 0;
+        }
+
+        .stat-ring {
+            text-align: center;
+        }
+
+        .circular-chart {
+            width: 100px;
+            height: 100px;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: var(--bg);
+            stroke-width: 3.8;
+        }
+
+        .circle {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 3.8;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            animation: progress 1s ease-out;
+        }
+
+        @keyframes progress {
+            0% {
+                stroke-dasharray: 0 100;
+            }
+        }
+
+        .percentage {
+            fill: var(--text-primary);
+            font-size: 0.5em;
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .stat-numbers {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            flex: 1;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            display: block;
+        }
+
+        .stat-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .course-type-stats {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .type-stat-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .type-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+            width: 60px;
+        }
+
+        .type-progress {
+            flex: 1;
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .type-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .type-numbers {
+            font-size: 12px;
+            color: var(--text-light);
+            width: 40px;
+            text-align: right;
         }
 
         /* 复盘模板 */
@@ -1483,6 +1704,18 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 课程进度统计 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📈 课程进度统计</span>
+                </div>
+                <div id="courseStatsContainer">
+                    <div class="empty-state">
+                        <p>暂无课程数据</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- 设置页面 -->
@@ -1676,6 +1909,29 @@
         </div>
     </div>
 
+    <!-- 课程详情模态框 -->
+    <div class="modal-overlay" id="courseDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="courseDetailTitle">课程详情</span>
+                <button class="modal-close" onclick="closeModal('courseDetailModal')">✕</button>
+            </div>
+            <div class="modal-body" id="courseDetailBody"></div>
+            <div class="modal-footer" style="flex-wrap: wrap; gap: 8px;">
+                <button class="btn btn-secondary" id="btnToggleCourseComplete">标记完成</button>
+                <button class="btn btn-primary" id="btnUploadMindMap">上传思维导图</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 思维导图预览模态框 -->
+    <div class="modal-overlay" id="mindmapPreviewModal">
+        <div class="modal" style="max-width: 90vw; background: transparent; box-shadow: none;">
+            <button class="modal-close" onclick="closeModal('mindmapPreviewModal')" style="position: absolute; top: -40px; right: 0; background: white; border-radius: 50%; width: 32px; height: 32px; border: none; cursor: pointer; font-size: 18px;">✕</button>
+            <img id="mindmapPreviewImg" class="mindmap-preview" alt="思维导图预览">
+        </div>
+    </div>
+
     <!-- Toast提示 -->
     <div class="toast" id="toast"></div>
 
@@ -1801,9 +2057,93 @@
             loadGoals();
             initReminder();
             
+            // 智能任务生成
+            generateDailyTasks();
+            
             // 检查是否需要结束学习提醒
             checkEndDayReminder();
         });
+
+        // ============ 智能任务生成 ============
+        function generateDailyTasks() {
+            const today = getTodayString();
+            const todayTasks = appData.tasks.filter(t => t.date === today && t.type === 'auto');
+            
+            // 如果今天已经有自动生成的任务，不再重复生成
+            if (todayTasks.length > 0) return;
+            
+            const todayCourses = appData.courses.filter(c => c.date === today);
+            const hasCourseToday = todayCourses.length > 0;
+            
+            const newTasks = [];
+            
+            if (hasCourseToday) {
+                // 有课当天：添加课前预习任务
+                todayCourses.forEach(course => {
+                    newTasks.push({
+                        id: generateId(),
+                        name: `课前预习 - ${course.name}`,
+                        category: '公共基础知识',
+                        date: today,
+                        startTime: '17:30',
+                        endTime: '18:30',
+                        duration: 60,
+                        priority: 'high',
+                        type: 'auto',
+                        relatedCourseId: course.id,
+                        completed: false
+                    });
+                });
+            } else {
+                // 无课当天：添加公考备考和AI学习任务
+                newTasks.push({
+                    id: generateId(),
+                    name: '公考备考 - 行测练习',
+                    category: '公共基础知识',
+                    date: today,
+                    startTime: '14:00',
+                    endTime: '15:00',
+                    duration: 60,
+                    priority: 'medium',
+                    type: 'auto',
+                    completed: false
+                });
+                newTasks.push({
+                    id: generateId(),
+                    name: 'AI工具学习',
+                    category: 'AI工具学习',
+                    date: today,
+                    startTime: '22:00',
+                    endTime: '23:00',
+                    duration: 60,
+                    priority: 'low',
+                    type: 'auto',
+                    completed: false
+                });
+            }
+            
+            // 添加每日复盘任务
+            newTasks.push({
+                id: generateId(),
+                name: '每日复盘',
+                category: '公共基础知识',
+                date: today,
+                startTime: '21:00',
+                endTime: '22:00',
+                duration: 60,
+                priority: 'medium',
+                type: 'auto',
+                completed: false
+            });
+            
+            // 添加新任务
+            newTasks.forEach(task => {
+                appData.tasks.push(task);
+            });
+            
+            saveData();
+            loadTasks();
+        }
 
         // ============ 导航功能 ============
         function initNavigation() {
@@ -2470,7 +2810,12 @@
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'calendar-day';
-                dayDiv.textContent = d;
+                
+                // 日期数字
+                const dayNum = document.createElement('div');
+                dayNum.className = 'calendar-day-num';
+                dayNum.textContent = d;
+                dayDiv.appendChild(dayNum);
 
                 if (year === today.getFullYear() && month === today.getMonth() && d === today.getDate()) {
                     dayDiv.classList.add('today');
@@ -2481,9 +2826,130 @@
                     dayDiv.classList.add('has-task');
                 }
 
+                // 显示课程标签
+                const dayCourses = appData.courses.filter(c => c.date === dateStr);
+                if (dayCourses.length > 0) {
+                    dayDiv.classList.add('has-course');
+                    const courseTags = document.createElement('div');
+                    courseTags.className = 'calendar-course-tags';
+                    dayCourses.forEach(course => {
+                        const tag = document.createElement('span');
+                        tag.className = 'calendar-course-tag' + (course.completed ? ' completed' : '');
+                        tag.textContent = course.name;
+                        tag.onclick = (e) => {
+                            e.stopPropagation();
+                            showCourseDetail(course.id);
+                        };
+                        courseTags.appendChild(tag);
+                    });
+                    dayDiv.appendChild(courseTags);
+                }
+
                 dayDiv.onclick = () => showDayTasks(dateStr);
                 grid.appendChild(dayDiv);
             }
+        }
+        
+        // 显示课程详情
+        function showCourseDetail(courseId) {
+            const course = appData.courses.find(c => c.id === courseId);
+            if (!course) return;
+            
+            const courseType = course.name.replace(/[0-9]/g, '');
+            const modal = document.getElementById('courseDetailModal');
+            
+            document.getElementById('courseDetailTitle').textContent = course.name;
+            document.getElementById('courseDetailBody').innerHTML = `
+                <div class="course-detail-info">
+                    <div class="course-detail-row">
+                        <span class="course-detail-label">📅 日期</span>
+                        <span>${course.date}</span>
+                    </div>
+                    <div class="course-detail-row">
+                        <span class="course-detail-label">⏰ 时间</span>
+                        <span>${course.time} - ${addHours(course.time, course.duration || 2)}</span>
+                    </div>
+                    <div class="course-detail-row">
+                        <span class="course-detail-label">📚 类型</span>
+                        <span>${courseType || '综合'}</span>
+                    </div>
+                    <div class="course-detail-row">
+                        <span class="course-detail-label">⏱️ 时长</span>
+                        <span>${course.duration || 2}小时</span>
+                    </div>
+                    <div class="course-detail-row">
+                        <span class="course-detail-label">📝 备注</span>
+                        <span>${course.note || '无'}</span>
+                    </div>
+                    <div class="course-detail-row">
+                        <span class="course-detail-label">✅ 状态</span>
+                        <span style="color: ${course.completed ? 'var(--success)' : 'var(--danger)'}">${course.completed ? '已完成' : '未完成'}</span>
+                    </div>
+                </div>
+                ${course.mindMaps && course.mindMaps.length > 0 ? `
+                <div class="course-mindmaps">
+                    <h4>📋 思维导图</h4>
+                    <div class="mindmap-grid">
+                        ${course.mindMaps.map((mm, idx) => `
+                            <img src="${mm.image}" alt="思维导图${idx+1}" onclick="showMindMap('${mm.image}')" class="mindmap-thumb">
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            // 设置按钮
+            document.getElementById('btnToggleCourseComplete').onclick = () => {
+                course.completed = !course.completed;
+                saveData();
+                renderCalendar();
+                loadCourseStats();
+                closeModal('courseDetailModal');
+                showToast(course.completed ? '已标记为完成' : '已标记为未完成');
+            };
+            
+            document.getElementById('btnUploadMindMap').onclick = () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            if (!course.mindMaps) course.mindMaps = [];
+                            if (course.mindMaps.length >= 3) {
+                                showToast('每节课最多上传3张思维导图');
+                                return;
+                            }
+                            course.mindMaps.push({
+                                id: generateId(),
+                                image: event.target.result,
+                                uploadTime: new Date().toISOString()
+                            });
+                            saveData();
+                            showCourseDetail(courseId);
+                            showToast('思维导图上传成功');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            };
+            
+            openModal('courseDetailModal');
+        }
+        
+        function addHours(time, hours) {
+            const [h, m] = time.split(':').map(Number);
+            const newH = h + hours;
+            return `${String(newH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+        
+        function showMindMap(imageSrc) {
+            const modal = document.getElementById('mindmapPreviewModal');
+            document.getElementById('mindmapPreviewImg').src = imageSrc;
+            openModal('mindmapPreviewModal');
         }
 
         function showDayTasks(dateStr) {
@@ -2650,6 +3116,83 @@
                     </div>
                 </div>
             `).join('');
+            
+            // 加载课程进度统计
+            loadCourseStats();
+        }
+
+        // ============ 课程进度统计 ============
+        function loadCourseStats() {
+            const courses = appData.courses;
+            const totalCourses = courses.length;
+            const completedCourses = courses.filter(c => c.completed).length;
+            const completionRate = totalCourses > 0 ? Math.round((completedCourses / totalCourses) * 100) : 0;
+            
+            // 按类型分组统计
+            const typeStats = {};
+            courses.forEach(course => {
+                const type = course.name.replace(/[0-9]/g, '') || '其他';
+                if (!typeStats[type]) {
+                    typeStats[type] = { total: 0, completed: 0 };
+                }
+                typeStats[type].total++;
+                if (course.completed) typeStats[type].completed++;
+            });
+            
+            // 计算出勤率（已过日期的课程完成比例）
+            const today = new Date().toISOString().split('T')[0];
+            const passedCourses = courses.filter(c => c.date <= today);
+            const passedCompleted = passedCourses.filter(c => c.completed).length;
+            const attendanceRate = passedCourses.length > 0 ? Math.round((passedCompleted / passedCourses.length) * 100) : 100;
+            
+            // 更新统计显示
+            const statsContainer = document.getElementById('courseStatsContainer');
+            if (statsContainer) {
+                statsContainer.innerHTML = `
+                    <div class="course-stats-overview">
+                        <div class="stat-ring">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="circle" stroke-dasharray="${completionRate}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <text x="18" y="20.35" class="percentage">${completionRate}%</text>
+                            </svg>
+                            <div class="stat-label">总完成率</div>
+                        </div>
+                        <div class="stat-numbers">
+                            <div class="stat-item">
+                                <span class="stat-value">${totalCourses}</span>
+                                <span class="stat-title">总课程</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" style="color: var(--success);">${completedCourses}</span>
+                                <span class="stat-title">已完成</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" style="color: var(--danger);">${totalCourses - completedCourses}</span>
+                                <span class="stat-title">未完成</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" style="color: var(--primary);">${attendanceRate}%</span>
+                                <span class="stat-title">出勤率</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-type-stats">
+                        ${Object.entries(typeStats).map(([type, stats]) => {
+                            const rate = Math.round((stats.completed / stats.total) * 100);
+                            return `
+                                <div class="type-stat-row">
+                                    <span class="type-name">${type}</span>
+                                    <div class="type-progress">
+                                        <div class="type-progress-bar" style="width: ${rate}%"></div>
+                                    </div>
+                                    <span class="type-numbers">${stats.completed}/${stats.total}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
         }
 
         function adjustGoal(type, delta) {
