@@ -2437,7 +2437,8 @@
             
             const todayCourses = appData.courses.filter(c => c.date === today);
             const hasCourseToday = todayCourses.length > 0;
-            const dayOfWeek = new Date(today).getDay();
+            const now = new Date();
+            const dayOfWeek = now.getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
             
             // 如果今天没有任何自动生成的任务，生成完整任务列表
@@ -2710,7 +2711,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(startOfWeek);
                 d.setDate(startOfWeek.getDate() + i);
-                weekDates.push(d.toISOString().split('T')[0]);
+                weekDates.push(formatDateLocal(d));
             }
             
             const weekCourses = appData.courses.filter(c => weekDates.includes(c.date));
@@ -2812,7 +2813,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(startOfWeek);
                 d.setDate(startOfWeek.getDate() + i);
-                const dateStr = d.toISOString().split('T')[0];
+                const dateStr = formatDateLocal(d);
                 
                 // 检查是否已有任务
                 const existingTasks = appData.tasks.filter(t => t.date === dateStr && t.type === 'auto');
@@ -2955,7 +2956,20 @@
         }
 
         function getTodayString() {
-            return new Date().toISOString().split('T')[0];
+            // 使用本地时区获取日期，避免UTC时区偏移
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 格式化日期为 YYYY-MM-DD（本地时区）
+        function formatDateLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
         // ============ 任务管理 ============
@@ -3366,7 +3380,7 @@
             for (let i = 0; i < 365; i++) {
                 const checkDate = new Date(today);
                 checkDate.setDate(checkDate.getDate() - i);
-                const dateStr = checkDate.toISOString().split('T')[0];
+                const dateStr = formatDateLocal(checkDate);
                 
                 const record = appData.timeRecords.find(r => r.date === dateStr);
                 const hasActivity = record && record.duration > 0;
@@ -3407,7 +3421,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
-                const record = appData.timeRecords.find(r => r.date === d.toISOString().split('T')[0]);
+                const record = appData.timeRecords.find(r => r.date === formatDateLocal(d));
                 if (record) weekDuration += record.duration;
             }
             document.getElementById('statWeek').textContent = formatDuration(weekDuration);
@@ -3417,7 +3431,7 @@
             for (let i = 0; i < 30; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
-                const record = appData.timeRecords.find(r => r.date === d.toISOString().split('T')[0]);
+                const record = appData.timeRecords.find(r => r.date === formatDateLocal(d));
                 if (record) monthDuration += record.duration;
             }
             document.getElementById('statMonth').textContent = formatDuration(monthDuration);
@@ -3481,7 +3495,7 @@
             for (let i = 6; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
-                const dateStr = d.toISOString().split('T')[0];
+                const dateStr = formatDateLocal(d);
                 labels.push(d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }));
                 
                 const record = appData.timeRecords.find(r => r.date === dateStr);
@@ -3546,7 +3560,7 @@
                     const dayIndex = (weeks - 1 - w) * 7 + d;
                     const checkDate = new Date(today);
                     checkDate.setDate(checkDate.getDate() - dayIndex);
-                    const dateStr = checkDate.toISOString().split('T')[0];
+                    const dateStr = formatDateLocal(checkDate);
                     
                     const record = appData.timeRecords.find(r => r.date === dateStr);
                     const hours = record ? record.duration / 3600 : 0;
@@ -3605,7 +3619,7 @@
             for (let i = 0; i < 365; i++) {
                 const checkDate = new Date(today);
                 checkDate.setDate(checkDate.getDate() - i);
-                const dateStr = checkDate.toISOString().split('T')[0];
+                const dateStr = formatDateLocal(checkDate);
                 
                 const record = appData.timeRecords.find(r => r.date === dateStr);
                 if (record && record.duration > 0) {
@@ -3859,7 +3873,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - (6 - i));
-                const dateStr = d.toISOString().split('T')[0];
+                const dateStr = formatDateLocal(d);
                 const record = appData.timeRecords.find(r => r.date === dateStr);
                 const hasActivity = record && record.duration > 0;
                 
@@ -4014,7 +4028,7 @@
             });
             
             // 计算出勤率（已过日期的课程完成比例）
-            const today = new Date().toISOString().split('T')[0];
+            const today = getTodayString();
             const passedCourses = courses.filter(c => c.date <= today);
             const passedCompleted = passedCourses.filter(c => c.completed).length;
             const attendanceRate = passedCourses.length > 0 ? Math.round((passedCompleted / passedCourses.length) * 100) : 100;
