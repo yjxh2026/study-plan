@@ -984,6 +984,257 @@
             text-align: right;
         }
 
+        /* 周计划页面样式 */
+        .week-nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .week-summary {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0;
+        }
+
+        .week-stat {
+            text-align: center;
+        }
+
+        .week-stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .week-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .week-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .week-timeline-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--primary);
+        }
+
+        .week-timeline-item.completed {
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .week-timeline-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            width: 80px;
+        }
+
+        .week-timeline-content {
+            flex: 1;
+        }
+
+        .week-timeline-title {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .week-timeline-time {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .week-daily-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .week-day-card {
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+
+        .week-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .week-day-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .week-day-date {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .week-day-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .week-task-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            padding: 6px 8px;
+            background: var(--card-bg);
+            border-radius: 4px;
+        }
+
+        .week-task-item.completed {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+
+        .week-task-time {
+            font-size: 11px;
+            color: var(--text-light);
+            min-width: 70px;
+        }
+
+        /* 任务操作菜单 */
+        .task-action-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: var(--radius) var(--radius) 0 0;
+            padding: 20px;
+            z-index: 2000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+        }
+
+        .task-action-menu.show {
+            transform: translateY(0);
+        }
+
+        .task-action-menu-header {
+            text-align: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .task-action-menu-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .task-action-menu-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .task-action-btn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 8px;
+            background: var(--bg);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .task-action-btn:hover {
+            background: var(--border);
+        }
+
+        .task-action-btn svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+        }
+
+        .task-action-btn.danger {
+            color: var(--danger);
+        }
+
+        .task-action-btn.danger svg {
+            color: var(--danger);
+        }
+
+        .task-action-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .task-action-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 课程任务特殊样式 */
+        .task-item.course-task {
+            border-left: 3px solid rgba(255, 107, 107, 0.85);
+        }
+
+        .task-item.course-task .task-checkbox {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: rgba(255, 107, 107, 0.85);
+        }
+
+        .task-item.course-attended .task-checkbox {
+            background: rgba(46, 213, 115, 0.2);
+            border-color: var(--success);
+        }
+
+        .course-status-tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
+        .course-status-tag.attended {
+            background: rgba(46, 213, 115, 0.2);
+            color: var(--success);
+        }
+
+        .course-status-tag.absent {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--danger);
+        }
+
+        .course-status-tag.pending {
+            background: var(--bg);
+            color: var(--text-light);
+        }
+
         /* 复盘模板 */
         .review-item {
             margin-bottom: 20px;
@@ -1404,6 +1655,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             今日
         </div>
+        <div class="bottom-nav-item" data-page="weekplan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/></svg>
+            周计划
+        </div>
         <div class="bottom-nav-item" data-page="calendar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             日历
@@ -1539,6 +1794,59 @@
                     <span class="card-title">📆 本周进度</span>
                 </div>
                 <div class="week-view" id="weekView"></div>
+            </div>
+        </section>
+
+        <!-- 周计划页面 -->
+        <section class="page" id="page-weekplan">
+            <div class="page-header">
+                <h1 class="page-title">📋 周计划</h1>
+                <p class="page-subtitle">本周课程与任务安排</p>
+            </div>
+
+            <!-- 周概览 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📊 本周概览</span>
+                    <div class="week-nav">
+                        <button class="btn btn-outline" onclick="changeWeek(-1)" style="padding: 6px 12px;">◀</button>
+                        <span id="weekRange" style="margin: 0 12px; font-size: 13px;"></span>
+                        <button class="btn btn-outline" onclick="changeWeek(1)" style="padding: 6px 12px;">▶</button>
+                    </div>
+                </div>
+                <div class="week-summary">
+                    <div class="week-stat">
+                        <span class="week-stat-value" id="weekCourseCount">0</span>
+                        <span class="week-stat-label">课程</span>
+                    </div>
+                    <div class="week-stat">
+                        <span class="week-stat-value" id="weekTaskCount">0</span>
+                        <span class="week-stat-label">任务</span>
+                    </div>
+                    <div class="week-stat">
+                        <span class="week-stat-value" id="weekCompletedCount">0</span>
+                        <span class="week-stat-label">已完成</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="generateWeekPlan()" style="margin-top: 16px;">
+                    🔄 一键生成本周计划
+                </button>
+            </div>
+
+            <!-- 本周课程时间线 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📚 本周课程时间线</span>
+                </div>
+                <div id="weekCourseTimeline" class="week-timeline"></div>
+            </div>
+
+            <!-- 每日任务分配 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📅 每日任务分配</span>
+                </div>
+                <div id="weekDailyTasks" class="week-daily-container"></div>
             </div>
         </section>
 
@@ -1958,6 +2266,35 @@
         </div>
     </div>
 
+    <!-- 任务操作菜单 -->
+    <div class="task-action-overlay" id="taskActionOverlay" onclick="closeTaskActionMenu()"></div>
+    <div class="task-action-menu" id="taskActionMenu">
+        <div class="task-action-menu-header">
+            <div class="task-action-menu-title" id="taskActionTitle">任务名称</div>
+            <div class="task-action-menu-meta" id="taskActionMeta"></div>
+        </div>
+        <button class="task-action-btn" onclick="taskActionStartTimer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            开始计时
+        </button>
+        <button class="task-action-btn" onclick="taskActionMarkComplete()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            标记完成
+        </button>
+        <button class="task-action-btn" id="btnMarkAttended" style="display:none" onclick="taskActionMarkAttended()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            标记已上课
+        </button>
+        <button class="task-action-btn danger" id="btnMarkAbsent" style="display:none" onclick="taskActionMarkAbsent()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            标记缺勤
+        </button>
+        <button class="task-action-btn" onclick="closeTaskActionMenu()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            取消
+        </button>
+    </div>
+
     <!-- Toast提示 -->
     <div class="toast" id="toast"></div>
 
@@ -2091,21 +2428,83 @@
         });
 
         // ============ 智能任务生成 ============
+        let currentTaskAction = null; // 当前操作的任务
+        
         function generateDailyTasks() {
             const today = getTodayString();
-            const todayTasks = appData.tasks.filter(t => t.date === today && t.type === 'auto');
+            const todayAutoTasks = appData.tasks.filter(t => t.date === today && t.type === 'auto');
             
             // 如果今天已经有自动生成的任务，不再重复生成
-            if (todayTasks.length > 0) return;
+            if (todayAutoTasks.length > 0) return;
             
             const todayCourses = appData.courses.filter(c => c.date === today);
             const hasCourseToday = todayCourses.length > 0;
+            const dayOfWeek = new Date(today).getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
             
             const newTasks = [];
             
+            // 1. 固定时间块：上午三支一扶备考
+            newTasks.push({
+                id: generateId(),
+                name: '三支一扶备考（上午）',
+                category: '公共基础知识',
+                date: today,
+                startTime: '08:00',
+                endTime: '12:00',
+                duration: 240,
+                priority: 'high',
+                type: 'auto',
+                completed: false
+            });
+            
+            // 2. 固定时间块：下午备考
             if (hasCourseToday) {
-                // 有课当天：添加课前预习任务
+                // 有课当天，下午压缩为2小时公考
+                newTasks.push({
+                    id: generateId(),
+                    name: '公考备考（下午）',
+                    category: '公共基础知识',
+                    date: today,
+                    startTime: '14:00',
+                    endTime: '16:00',
+                    duration: 120,
+                    priority: 'medium',
+                    type: 'auto',
+                    completed: false
+                });
+            } else {
+                // 无课当天，下午三支一扶+公考
+                newTasks.push({
+                    id: generateId(),
+                    name: '三支一扶备考（下午）',
+                    category: '公共基础知识',
+                    date: today,
+                    startTime: '14:00',
+                    endTime: '16:00',
+                    duration: 120,
+                    priority: 'high',
+                    type: 'auto',
+                    completed: false
+                });
+                newTasks.push({
+                    id: generateId(),
+                    name: '公考备考',
+                    category: '公共基础知识',
+                    date: today,
+                    startTime: '16:00',
+                    endTime: '17:00',
+                    duration: 60,
+                    priority: 'medium',
+                    type: 'auto',
+                    completed: false
+                });
+            }
+            
+            // 3. 如果有课程，添加课前预习和课程本身
+            if (hasCourseToday) {
                 todayCourses.forEach(course => {
+                    // 课前预习
                     newTasks.push({
                         id: generateId(),
                         name: `课前预习 - ${course.name}`,
@@ -2119,36 +2518,26 @@
                         relatedCourseId: course.id,
                         completed: false
                     });
-                });
-            } else {
-                // 无课当天：添加公考备考和AI学习任务
-                newTasks.push({
-                    id: generateId(),
-                    name: '公考备考 - 行测练习',
-                    category: '公共基础知识',
-                    date: today,
-                    startTime: '14:00',
-                    endTime: '15:00',
-                    duration: 60,
-                    priority: 'medium',
-                    type: 'auto',
-                    completed: false
-                });
-                newTasks.push({
-                    id: generateId(),
-                    name: 'AI工具学习',
-                    category: 'AI工具学习',
-                    date: today,
-                    startTime: '22:00',
-                    endTime: '23:00',
-                    duration: 60,
-                    priority: 'low',
-                    type: 'auto',
-                    completed: false
+                    
+                    // 课程本身（特殊类型，不可勾选）
+                    newTasks.push({
+                        id: generateId(),
+                        name: `📚 ${course.name}`,
+                        category: '线上课程',
+                        date: today,
+                        startTime: course.time || '18:30',
+                        endTime: addHours(course.time || '18:30', course.duration || 2),
+                        duration: (course.duration || 2) * 60,
+                        priority: 'high',
+                        type: 'course',
+                        relatedCourseId: course.id,
+                        completed: false,
+                        attendance: 'pending' // pending, attended, absent
+                    });
                 });
             }
             
-            // 添加每日复盘任务
+            // 4. 每日复盘
             newTasks.push({
                 id: generateId(),
                 name: '每日复盘',
@@ -2161,6 +2550,35 @@
                 type: 'auto',
                 completed: false
             });
+            
+            // 5. 技能学习（周末延长）
+            if (isWeekend) {
+                newTasks.push({
+                    id: generateId(),
+                    name: '技能学习（AI/剪辑）',
+                    category: 'AI工具学习',
+                    date: today,
+                    startTime: '22:00',
+                    endTime: '24:00',
+                    duration: 120,
+                    priority: 'low',
+                    type: 'auto',
+                    completed: false
+                });
+            } else {
+                newTasks.push({
+                    id: generateId(),
+                    name: '技能学习',
+                    category: 'AI工具学习',
+                    date: today,
+                    startTime: '22:00',
+                    endTime: '23:00',
+                    duration: 60,
+                    priority: 'low',
+                    type: 'auto',
+                    completed: false
+                });
+            }
             
             // 添加新任务
             newTasks.forEach(task => {
@@ -2200,7 +2618,265 @@
                 renderWeekView();
             } else if (pageName === 'goals') {
                 loadGoals();
+            } else if (pageName === 'weekplan') {
+                loadWeekPlan();
             }
+        }
+
+        // ============ 周计划功能 ============
+        let currentWeekOffset = 0;
+
+        function loadWeekPlan() {
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + currentWeekOffset * 7);
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            // 更新周范围显示
+            document.getElementById('weekRange').textContent = 
+                `${startOfWeek.getMonth() + 1}月${startOfWeek.getDate()}日 - ${endOfWeek.getMonth() + 1}月${endOfWeek.getDate()}日`;
+            
+            // 获取本周数据
+            const weekDates = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(startOfWeek);
+                d.setDate(startOfWeek.getDate() + i);
+                weekDates.push(d.toISOString().split('T')[0]);
+            }
+            
+            const weekCourses = appData.courses.filter(c => weekDates.includes(c.date));
+            const weekTasks = appData.tasks.filter(t => weekDates.includes(t.date));
+            
+            // 更新统计
+            document.getElementById('weekCourseCount').textContent = weekCourses.length;
+            document.getElementById('weekTaskCount').textContent = weekTasks.length;
+            document.getElementById('weekCompletedCount').textContent = 
+                weekTasks.filter(t => t.completed || t.attendance === 'attended').length;
+            
+            // 渲染课程时间线
+            renderWeekCourseTimeline(weekCourses);
+            
+            // 渲染每日任务
+            renderWeekDailyTasks(weekDates, weekCourses, weekTasks);
+        }
+
+        function renderWeekCourseTimeline(courses) {
+            const container = document.getElementById('weekCourseTimeline');
+            
+            if (courses.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>本周暂无课程安排</p></div>';
+                return;
+            }
+            
+            // 按日期排序
+            courses.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+            
+            container.innerHTML = courses.map(course => {
+                const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+                const date = new Date(course.date);
+                const dayName = weekDays[date.getDay()];
+                const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+                
+                return `
+                    <div class="week-timeline-item ${course.completed ? 'completed' : ''}">
+                        <div class="week-timeline-date">
+                            <div>${dayName}</div>
+                            <div style="font-size: 11px; color: var(--text-light);">${dateStr}</div>
+                        </div>
+                        <div class="week-timeline-content">
+                            <div class="week-timeline-title">${course.name}</div>
+                            <div class="week-timeline-time">${course.time} | ${course.duration || 2}小时</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderWeekDailyTasks(weekDates, courses, tasks) {
+            const container = document.getElementById('weekDailyTasks');
+            const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const today = getTodayString();
+            
+            container.innerHTML = weekDates.map((date, index) => {
+                const dateObj = new Date(date);
+                const dayTasks = tasks.filter(t => t.date === date);
+                const dayCourses = courses.filter(c => c.date === date);
+                
+                return `
+                    <div class="week-day-card ${date === today ? 'today' : ''}">
+                        <div class="week-day-header">
+                            <span class="week-day-title">${weekDays[index]}</span>
+                            <span class="week-day-date">${dateObj.getMonth() + 1}月${dateObj.getDate()}日</span>
+                        </div>
+                        <div class="week-day-tasks">
+                            ${dayCourses.length > 0 ? dayCourses.map(c => `
+                                <div class="week-task-item ${c.completed ? 'completed' : ''}">
+                                    <span style="color: rgba(255,107,107,0.85);">📚</span>
+                                    <span style="flex: 1;">${c.name}</span>
+                                    <span class="week-task-time">${c.time}</span>
+                                </div>
+                            `).join('') : ''}
+                            ${dayTasks.length > 0 ? dayTasks.map(t => `
+                                <div class="week-task-item ${t.completed || t.attendance === 'attended' ? 'completed' : ''}">
+                                    <span>${t.completed || t.attendance === 'attended' ? '✅' : '⭕'}</span>
+                                    <span style="flex: 1;">${t.name}</span>
+                                    <span class="week-task-time">${t.startTime || ''}</span>
+                                </div>
+                            `).join('') : '<div style="font-size: 12px; color: var(--text-light); padding: 8px;">暂无任务</div>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function changeWeek(delta) {
+            currentWeekOffset += delta;
+            loadWeekPlan();
+        }
+
+        function generateWeekPlan() {
+            // 为本周的每一天生成任务
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + currentWeekOffset * 7);
+            
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(startOfWeek);
+                d.setDate(startOfWeek.getDate() + i);
+                const dateStr = d.toISOString().split('T')[0];
+                
+                // 检查是否已有任务
+                const existingTasks = appData.tasks.filter(t => t.date === dateStr && t.type === 'auto');
+                if (existingTasks.length > 0) continue;
+                
+                // 为这一天生成任务
+                const dayOfWeek = d.getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const dayCourses = appData.courses.filter(c => c.date === dateStr);
+                const hasCourseToday = dayCourses.length > 0;
+                
+                // 上午三支一扶
+                appData.tasks.push({
+                    id: generateId(),
+                    name: '三支一扶备考（上午）',
+                    category: '公共基础知识',
+                    date: dateStr,
+                    startTime: '08:00',
+                    endTime: '12:00',
+                    duration: 240,
+                    priority: 'high',
+                    type: 'auto',
+                    completed: false
+                });
+                
+                // 下午
+                if (hasCourseToday) {
+                    appData.tasks.push({
+                        id: generateId(),
+                        name: '公考备考（下午）',
+                        category: '公共基础知识',
+                        date: dateStr,
+                        startTime: '14:00',
+                        endTime: '16:00',
+                        duration: 120,
+                        priority: 'medium',
+                        type: 'auto',
+                        completed: false
+                    });
+                    
+                    // 课程相关
+                    dayCourses.forEach(course => {
+                        appData.tasks.push({
+                            id: generateId(),
+                            name: `课前预习 - ${course.name}`,
+                            category: '公共基础知识',
+                            date: dateStr,
+                            startTime: '17:30',
+                            endTime: '18:30',
+                            duration: 60,
+                            priority: 'high',
+                            type: 'auto',
+                            relatedCourseId: course.id,
+                            completed: false
+                        });
+                        
+                        appData.tasks.push({
+                            id: generateId(),
+                            name: `📚 ${course.name}`,
+                            category: '线上课程',
+                            date: dateStr,
+                            startTime: course.time || '18:30',
+                            endTime: addHours(course.time || '18:30', course.duration || 2),
+                            duration: (course.duration || 2) * 60,
+                            priority: 'high',
+                            type: 'course',
+                            relatedCourseId: course.id,
+                            completed: false,
+                            attendance: 'pending'
+                        });
+                    });
+                } else {
+                    appData.tasks.push({
+                        id: generateId(),
+                        name: '三支一扶备考（下午）',
+                        category: '公共基础知识',
+                        date: dateStr,
+                        startTime: '14:00',
+                        endTime: '16:00',
+                        duration: 120,
+                        priority: 'high',
+                        type: 'auto',
+                        completed: false
+                    });
+                    
+                    appData.tasks.push({
+                        id: generateId(),
+                        name: '公考备考',
+                        category: '公共基础知识',
+                        date: dateStr,
+                        startTime: '16:00',
+                        endTime: '17:00',
+                        duration: 60,
+                        priority: 'medium',
+                        type: 'auto',
+                        completed: false
+                    });
+                }
+                
+                // 复盘
+                appData.tasks.push({
+                    id: generateId(),
+                    name: '每日复盘',
+                    category: '公共基础知识',
+                    date: dateStr,
+                    startTime: '21:00',
+                    endTime: '22:00',
+                    duration: 60,
+                    priority: 'medium',
+                    type: 'auto',
+                    completed: false
+                });
+                
+                // 技能学习
+                appData.tasks.push({
+                    id: generateId(),
+                    name: isWeekend ? '技能学习（AI/剪辑）' : '技能学习',
+                    category: 'AI工具学习',
+                    date: dateStr,
+                    startTime: '22:00',
+                    endTime: isWeekend ? '24:00' : '23:00',
+                    duration: isWeekend ? 120 : 60,
+                    priority: 'low',
+                    type: 'auto',
+                    completed: false
+                });
+            }
+            
+            saveData();
+            loadWeekPlan();
+            showToast('本周计划已生成');
         }
 
         // ============ 日期功能 ============
@@ -2259,42 +2935,47 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        <p>暂无今日任务，点击上方按钮添加</p>
+                        <p>暂无今日任务</p>
                     </div>
                 `;
                 return;
             }
 
-            // 按优先级和状态排序
-            const priorityOrder = { high: 0, medium: 1, low: 2 };
+            // 按时间排序
             tasks.sort((a, b) => {
-                if (a.status === 'completed' && b.status !== 'completed') return 1;
-                if (a.status !== 'completed' && b.status === 'completed') return -1;
-                return priorityOrder[a.priority] - priorityOrder[b.priority];
+                const timeA = a.startTime || '00:00';
+                const timeB = b.startTime || '00:00';
+                return timeA.localeCompare(timeB);
             });
 
             container.innerHTML = tasks.map(task => {
+                const isCourseTask = task.type === 'course';
+                const attendance = task.attendance || 'pending';
                 const isActive = timerState.currentTaskId === task.id;
-                const categoryClass = ['公共基础知识', '三农综合写作', '行测', '申论'].includes(task.category) ? 'tag-gongkao' : 'tag-jiNeng';
-                const priorityClass = task.priority === 'high' ? 'tag-high' : (task.priority === 'medium' ? 'tag-medium' : 'tag-low');
+                
+                let statusTag = '';
+                if (isCourseTask) {
+                    if (attendance === 'attended') {
+                        statusTag = '<span class="course-status-tag attended">已上课</span>';
+                    } else if (attendance === 'absent') {
+                        statusTag = '<span class="course-status-tag absent">缺勤</span>';
+                    } else {
+                        statusTag = '<span class="course-status-tag pending">待上课</span>';
+                    }
+                }
                 
                 return `
-                    <div class="task-item ${task.status === 'completed' ? 'completed' : ''} ${isActive ? 'active' : ''}" 
+                    <div class="task-item ${task.completed ? 'completed' : ''} ${isActive ? 'active' : ''} ${isCourseTask ? 'course-task' : ''} ${attendance === 'attended' ? 'course-attended' : ''}" 
                          onclick="handleTaskClick('${task.id}')">
-                        <div class="task-checkbox">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div class="task-checkbox ${isCourseTask ? 'course-checkbox' : ''}" style="${isCourseTask ? 'cursor: default;' : ''}">
+                            ${!isCourseTask ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '📚'}
                         </div>
                         <div class="task-content">
-                            <div class="task-name">${task.name}</div>
+                            <div class="task-name">${task.name} ${statusTag}</div>
                             <div class="task-meta">
-                                <span class="task-tag ${categoryClass}">${task.category}</span>
-                                <span class="task-tag ${priorityClass}">${task.priority === 'high' ? '高优' : (task.priority === 'medium' ? '中优' : '低')}</span>
-                                <span>预计 ${task.duration}分钟</span>
+                                <span class="task-tag">${task.category}</span>
+                                ${task.startTime ? `<span>${task.startTime}-${task.endTime}</span>` : ''}
                             </div>
-                        </div>
-                        <div class="task-time">
-                            <div class="task-duration">${task.actualDuration > 0 ? formatDuration(task.actualDuration) : formatDuration(task.duration * 60)}</div>
-                            <div class="task-actual">${task.actualDuration > 0 ? '已学' : ''}</div>
                         </div>
                     </div>
                 `;
@@ -2304,34 +2985,102 @@
         function handleTaskClick(taskId) {
             const task = appData.tasks.find(t => t.id === taskId);
             if (!task) return;
-
-            if (task.status === 'completed') {
-                // 取消完成状态
-                task.status = 'pending';
-                saveData();
-                loadTasks();
-                return;
-            }
-
-            // 开始计时
-            if (timerState.currentTaskId && timerState.currentTaskId !== taskId) {
-                // 切换任务，保存上一个
-                pauseTimer(true);
-            }
-
-            timerState.currentTaskId = taskId;
-            task.status = 'in-progress';
-            saveData();
             
-            document.getElementById('timerTaskName').textContent = task.name;
+            // 显示任务操作菜单
+            showTaskActionMenu(task);
+        }
+
+        // ============ 任务操作菜单 ============
+        function showTaskActionMenu(task) {
+            currentTaskAction = task;
+            
+            document.getElementById('taskActionTitle').textContent = task.name;
+            document.getElementById('taskActionMeta').textContent = 
+                `${task.category} ${task.startTime ? `| ${task.startTime}-${task.endTime}` : ''}`;
+            
+            // 根据任务类型显示不同按钮
+            const isCourseTask = task.type === 'course';
+            const btnMarkAttended = document.getElementById('btnMarkAttended');
+            const btnMarkAbsent = document.getElementById('btnMarkAbsent');
+            const btnMarkComplete = document.querySelector('.task-action-btn:nth-child(3)');
+            
+            if (isCourseTask) {
+                btnMarkAttended.style.display = 'flex';
+                btnMarkAbsent.style.display = 'flex';
+                btnMarkComplete.style.display = 'none';
+            } else {
+                btnMarkAttended.style.display = 'none';
+                btnMarkAbsent.style.display = 'none';
+                btnMarkComplete.style.display = 'flex';
+                btnMarkComplete.textContent = task.completed ? '取消完成' : '标记完成';
+            }
+            
+            document.getElementById('taskActionOverlay').classList.add('show');
+            document.getElementById('taskActionMenu').classList.add('show');
+        }
+
+        function closeTaskActionMenu() {
+            document.getElementById('taskActionOverlay').classList.remove('show');
+            document.getElementById('taskActionMenu').classList.remove('show');
+            currentTaskAction = null;
+        }
+
+        function taskActionStartTimer() {
+            if (!currentTaskAction) return;
+            
+            // 如果已有任务在计时，先暂停
+            if (timerState.isRunning) {
+                pauseTimer(false);
+            }
+            
+            timerState.currentTaskId = currentTaskAction.id;
+            timerState.startTime = Date.now();
+            timerState.elapsedTime = 0;
+            timerState.isRunning = true;
+            
+            document.getElementById('timerTaskName').textContent = currentTaskAction.name;
             document.getElementById('playIcon').style.display = 'none';
             document.getElementById('pauseIcon').style.display = 'block';
             
-            if (!timerState.isRunning) {
-                startTimer();
-            }
+            startTimer();
+            closeTaskActionMenu();
+            showToast('开始计时');
+        }
+
+        function taskActionMarkComplete() {
+            if (!currentTaskAction) return;
             
+            currentTaskAction.completed = !currentTaskAction.completed;
+            saveData();
             loadTasks();
+            closeTaskActionMenu();
+            showToast(currentTaskAction.completed ? '已标记完成' : '已取消完成');
+        }
+
+        function taskActionMarkAttended() {
+            if (!currentTaskAction) return;
+            
+            currentTaskAction.attendance = 'attended';
+            // 同时标记关联课程为完成
+            if (currentTaskAction.relatedCourseId) {
+                const course = appData.courses.find(c => c.id === currentTaskAction.relatedCourseId);
+                if (course) course.completed = true;
+            }
+            saveData();
+            loadTasks();
+            loadCourseStats();
+            closeTaskActionMenu();
+            showToast('已标记上课');
+        }
+
+        function taskActionMarkAbsent() {
+            if (!currentTaskAction) return;
+            
+            currentTaskAction.attendance = 'absent';
+            saveData();
+            loadTasks();
+            closeTaskActionMenu();
+            showToast('已标记缺勤');
         }
 
         function openAddTaskModal() {
