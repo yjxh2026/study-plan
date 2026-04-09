@@ -707,24 +707,22 @@
         }
 
         .calendar-day {
-            min-height: 56px;
+            aspect-ratio: auto;
+            min-height: 60px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: 6px 2px;
+            padding: 4px;
             font-size: 14px;
             border-radius: var(--radius-sm);
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
-            background: var(--card-bg);
         }
 
         .calendar-day-num {
             font-weight: 500;
-            line-height: 1;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .calendar-day:hover {
@@ -737,13 +735,13 @@
         }
 
         .calendar-day.today .calendar-course-tag {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.3);
         }
 
         .calendar-day.has-task::after {
             content: '';
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             background: var(--secondary);
             border-radius: 50%;
             position: absolute;
@@ -753,7 +751,6 @@
 
         .calendar-day.empty {
             cursor: default;
-            background: transparent;
         }
 
         .calendar-course-tags {
@@ -761,23 +758,20 @@
             flex-direction: column;
             gap: 2px;
             width: 100%;
-            max-height: 36px;
-            overflow: hidden;
         }
 
         .calendar-course-tag {
-            font-size: 8px;
-            padding: 1px 3px;
+            font-size: 9px;
+            padding: 2px 4px;
             background: rgba(255, 107, 107, 0.85);
             color: white;
-            border-radius: 3px;
+            border-radius: 4px;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
             transition: all 0.2s;
-            line-height: 1.2;
         }
 
         .calendar-course-tag:hover {
@@ -791,28 +785,8 @@
         }
 
         .calendar-course-tag.completed::after {
-            content: '✓';
+            content: ' ✓';
             font-weight: bold;
-            margin-left: 2px;
-        }
-
-        /* 手机端日历优化 */
-        @media (max-width: 480px) {
-            .calendar-grid {
-                gap: 4px;
-            }
-            .calendar-day {
-                min-height: 50px;
-                padding: 4px 1px;
-                font-size: 12px;
-            }
-            .calendar-day-num {
-                font-size: 11px;
-            }
-            .calendar-course-tag {
-                font-size: 7px;
-                padding: 1px 2px;
-            }
         }
 
         /* 课程详情样式 */
