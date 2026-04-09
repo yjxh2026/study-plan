@@ -1791,7 +1791,8 @@
             <!-- 周学习视图 -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">📆 本周进度</span>
+                    <span class="card-title">📆 近7天学习打卡</span>
+                    <span class="card-subtitle" style="font-size: 11px; color: var(--text-light);">绿色表示当天有学习记录</span>
                 </div>
                 <div class="week-view" id="weekView"></div>
             </div>
@@ -2288,6 +2289,10 @@
         <button class="task-action-btn danger" id="btnMarkAbsent" style="display:none" onclick="taskActionMarkAbsent()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             标记缺勤
+        </button>
+        <button class="task-action-btn" id="btnResetStatus" style="display:none" onclick="taskActionResetStatus()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            重置状态
         </button>
         <button class="task-action-btn" onclick="closeTaskActionMenu()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -3113,17 +3118,31 @@
             
             // 根据任务类型显示不同按钮
             const isCourseTask = task.type === 'course';
+            const attendance = task.attendance || 'pending';
             const btnMarkAttended = document.getElementById('btnMarkAttended');
             const btnMarkAbsent = document.getElementById('btnMarkAbsent');
+            const btnResetStatus = document.getElementById('btnResetStatus');
             const btnMarkComplete = document.querySelector('.task-action-btn:nth-child(3)');
             
             if (isCourseTask) {
-                btnMarkAttended.style.display = 'flex';
-                btnMarkAbsent.style.display = 'flex';
+                // 课程任务：根据当前状态显示不同按钮
+                if (attendance === 'pending') {
+                    // 待上课状态：显示标记按钮
+                    btnMarkAttended.style.display = 'flex';
+                    btnMarkAbsent.style.display = 'flex';
+                    btnResetStatus.style.display = 'none';
+                } else {
+                    // 已标记状态：显示重置按钮
+                    btnMarkAttended.style.display = 'none';
+                    btnMarkAbsent.style.display = 'none';
+                    btnResetStatus.style.display = 'flex';
+                    btnResetStatus.textContent = attendance === 'attended' ? '取消上课标记' : '取消缺勤标记';
+                }
                 btnMarkComplete.style.display = 'none';
             } else {
                 btnMarkAttended.style.display = 'none';
                 btnMarkAbsent.style.display = 'none';
+                btnResetStatus.style.display = 'none';
                 btnMarkComplete.style.display = 'flex';
                 btnMarkComplete.textContent = task.completed ? '取消完成' : '标记完成';
             }
@@ -3194,6 +3213,23 @@
             loadTasks();
             closeTaskActionMenu();
             showToast('已标记缺勤');
+        }
+        
+        function taskActionResetStatus() {
+            if (!currentTaskAction) return;
+            
+            // 重置课程任务状态
+            currentTaskAction.attendance = 'pending';
+            // 同时取消关联课程的完成状态
+            if (currentTaskAction.relatedCourseId) {
+                const course = appData.courses.find(c => c.id === currentTaskAction.relatedCourseId);
+                if (course) course.completed = false;
+            }
+            saveData();
+            loadTasks();
+            loadCourseStats();
+            closeTaskActionMenu();
+            showToast('已重置状态');
         }
 
         function openAddTaskModal() {
