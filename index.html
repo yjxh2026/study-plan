@@ -2433,15 +2433,82 @@
         function generateDailyTasks() {
             const today = getTodayString();
             const todayAutoTasks = appData.tasks.filter(t => t.date === today && t.type === 'auto');
-            
-            // 如果今天已经有自动生成的任务，不再重复生成
-            if (todayAutoTasks.length > 0) return;
+            const todayCourseTasks = appData.tasks.filter(t => t.date === today && t.type === 'course');
             
             const todayCourses = appData.courses.filter(c => c.date === today);
             const hasCourseToday = todayCourses.length > 0;
             const dayOfWeek = new Date(today).getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
             
+            // 如果今天没有任何自动生成的任务，生成完整任务列表
+            if (todayAutoTasks.length === 0) {
+                generateFullDailyTasks(today, todayCourses, hasCourseToday, isWeekend);
+                return;
+            }
+            
+            // 如果今天已有auto任务但缺少课程任务，补充课程任务
+            if (hasCourseToday && todayCourseTasks.length === 0) {
+                supplementCourseTasks(today, todayCourses);
+            }
+        }
+        
+        // 补充课程任务
+        function supplementCourseTasks(today, todayCourses) {
+            const newTasks = [];
+            
+            todayCourses.forEach(course => {
+                // 检查是否已有该课程的预习任务
+                const hasPreviewTask = appData.tasks.some(t => 
+                    t.date === today && 
+                    t.relatedCourseId === course.id && 
+                    t.name.includes('课前预习')
+                );
+                
+                // 如果没有预习任务，添加
+                if (!hasPreviewTask) {
+                    newTasks.push({
+                        id: generateId(),
+                        name: `课前预习 - ${course.name}`,
+                        category: '公共基础知识',
+                        date: today,
+                        startTime: '17:30',
+                        endTime: '18:30',
+                        duration: 60,
+                        priority: 'high',
+                        type: 'auto',
+                        relatedCourseId: course.id,
+                        completed: false
+                    });
+                }
+                
+                // 添加课程任务（特殊类型，不可勾选）
+                newTasks.push({
+                    id: generateId(),
+                    name: `📚 ${course.name}`,
+                    category: '线上课程',
+                    date: today,
+                    startTime: course.time || '18:30',
+                    endTime: addHours(course.time || '18:30', course.duration || 2),
+                    duration: (course.duration || 2) * 60,
+                    priority: 'high',
+                    type: 'course',
+                    relatedCourseId: course.id,
+                    completed: false,
+                    attendance: 'pending'
+                });
+            });
+            
+            if (newTasks.length > 0) {
+                newTasks.forEach(task => {
+                    appData.tasks.push(task);
+                });
+                saveData();
+                loadTasks();
+            }
+        }
+        
+        // 生成完整每日任务
+        function generateFullDailyTasks(today, todayCourses, hasCourseToday, isWeekend) {
             const newTasks = [];
             
             // 1. 固定时间块：上午三支一扶备考
