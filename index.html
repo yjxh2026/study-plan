@@ -1707,11 +1707,66 @@
             ],
             timeRecords: [],
             reviews: [],
-            courses: [],
-            achievements: []
+            courses: [
+                { id: 1, name: '法律1', date: '2026-04-01', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 2, name: '法律2', date: '2026-04-02', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 3, name: '法律3', date: '2026-04-03', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 4, name: '综合写作1', date: '2026-04-04', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 5, name: '法律4', date: '2026-04-05', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 6, name: '综合写作2', date: '2026-04-06', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 7, name: '法律5', date: '2026-04-07', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 8, name: '综合写作3', date: '2026-04-08', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 9, name: '法律6', date: '2026-04-09', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 10, name: '法律7', date: '2026-04-10', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 11, name: '综合写作4', date: '2026-04-11', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 12, name: '综合写作5', date: '2026-04-13', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 13, name: '哲学1', date: '2026-04-15', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 14, name: '哲学2', date: '2026-04-16', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 15, name: '时政1', date: '2026-04-17', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 16, name: '时政2', date: '2026-04-19', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 17, name: '常识1', date: '2026-04-20', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 18, name: '时政3', date: '2026-04-21', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 19, name: '常识2', date: '2026-04-23', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 20, name: '时政4', date: '2026-04-24', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 21, name: '常识3', date: '2026-04-25', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 22, name: '省情1', date: '2026-04-27', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 23, name: '省情2', date: '2026-04-28', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 24, name: '时政5', date: '2026-04-29', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 25, name: '省情3', date: '2026-04-30', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 26, name: '经济1', date: '2026-05-06', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 27, name: '经济2', date: '2026-05-08', time: '18:30', duration: 2, note: '线上课程' }
+            ],
+            achievements: [],
+            dataVersion: '2.0'
         };
 
-        let appData = JSON.parse(localStorage.getItem('studyPlannerData')) || JSON.parse(JSON.stringify(defaultData));
+        // 加载数据并合并新分类/任务
+        let savedData = JSON.parse(localStorage.getItem('studyPlannerData'));
+        if (savedData && savedData.dataVersion !== defaultData.dataVersion) {
+            // 合并新分类
+            defaultData.categories.forEach(cat => {
+                if (!savedData.categories.includes(cat)) {
+                    savedData.categories.push(cat);
+                }
+            });
+            // 合并新任务
+            defaultData.tasks.forEach(task => {
+                if (!savedData.tasks.find(t => t.name === task.name)) {
+                    savedData.tasks.push(task);
+                }
+            });
+            // 合并新课程
+            defaultData.courses.forEach(course => {
+                if (!savedData.courses.find(c => c.name === course.name && c.date === course.date)) {
+                    savedData.courses.push(course);
+                }
+            });
+            // 更新设置
+            savedData.settings.subjectAllocation = defaultData.settings.subjectAllocation;
+            savedData.dataVersion = defaultData.dataVersion;
+            localStorage.setItem('studyPlannerData', JSON.stringify(savedData));
+        }
+        let appData = savedData || JSON.parse(JSON.stringify(defaultData));
 
         // 计时器状态
         let timerState = {
