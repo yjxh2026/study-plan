@@ -258,6 +258,14 @@
             gap: 12px;
         }
 
+        .task-priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
         .task-item {
             display: flex;
             align-items: center;
@@ -288,7 +296,7 @@
             height: 24px;
             border: 2px solid var(--border);
             border-radius: 50%;
-            margin-right: 12px;
+            margin-right: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1086,6 +1094,13 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+        }
+
+        .week-priority-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
         .week-task-item {
@@ -2780,18 +2795,20 @@
                         <div class="week-day-tasks">
                             ${dayCourses.length > 0 ? dayCourses.map(c => `
                                 <div class="week-task-item ${c.completed ? 'completed' : ''}">
-                                    <span style="color: rgba(255,107,107,0.85);">📚</span>
-                                    <span style="flex: 1;">${c.name}</span>
+                                    <span class="week-priority-dot" style="background: #FF6B6B;"></span>
+                                    <span style="flex: 1;">📚 ${c.name}</span>
                                     <span class="week-task-time">${c.time}</span>
                                 </div>
                             `).join('') : ''}
-                            ${dayTasks.length > 0 ? dayTasks.map(t => `
+                            ${dayTasks.length > 0 ? dayTasks.map(t => {
+                                const color = getTaskPriorityColor(t);
+                                return `
                                 <div class="week-task-item ${t.completed || t.attendance === 'attended' ? 'completed' : ''}">
-                                    <span>${t.completed || t.attendance === 'attended' ? '✅' : '⭕'}</span>
+                                    <span class="week-priority-dot" style="background: ${color.color};"></span>
                                     <span style="flex: 1;">${t.name}</span>
                                     <span class="week-task-time">${t.startTime || ''}</span>
                                 </div>
-                            `).join('') : '<div style="font-size: 12px; color: var(--text-light); padding: 8px;">暂无任务</div>'}
+                            `}).join('') : '<div style="font-size: 12px; color: var(--text-light); padding: 8px;">暂无任务</div>'}
                         </div>
                     </div>
                 `;
@@ -2959,6 +2976,36 @@
         }
 
         // ============ 任务管理 ============
+        // 任务优先级颜色配置
+        function getTaskPriorityColor(task) {
+            // 线上课程 - 红色（最高）
+            if (task.type === 'course' || task.category === '线上课程') {
+                return { color: '#FF6B6B', level: 1, label: '线上课程' };
+            }
+            // 三支一扶备考 - 橙红色
+            if (task.name.includes('三支一扶') || task.name.includes('课前预习')) {
+                return { color: '#FF8C42', level: 2, label: '三支一扶' };
+            }
+            // 公考备考 - 橙色
+            if (task.name.includes('公考') || task.name.includes('行测')) {
+                return { color: '#FFA940', level: 3, label: '公考备考' };
+            }
+            // AI学习 - 黄色
+            if (task.category === 'AI工具学习' || task.name.includes('AI') || task.name.includes('技能学习')) {
+                return { color: '#FFD93D', level: 4, label: 'AI学习' };
+            }
+            // 视频剪辑 - 蓝色（最低）
+            if (task.name.includes('视频') || task.name.includes('剪辑')) {
+                return { color: '#4A9FF5', level: 5, label: '视频剪辑' };
+            }
+            // 公共基础知识 - 橙红色（与三支一扶同级）
+            if (task.category === '公共基础知识') {
+                return { color: '#FF8C42', level: 2, label: '公共基础' };
+            }
+            // 默认 - 灰色
+            return { color: '#BFBFBF', level: 99, label: '其他' };
+        }
+        
         function loadTasks() {
             const today = getTodayString();
             const todayTasks = appData.tasks.filter(t => t.date === today);
@@ -3019,6 +3066,7 @@
                 const isCourseTask = task.type === 'course';
                 const attendance = task.attendance || 'pending';
                 const isActive = timerState.currentTaskId === task.id;
+                const priorityColor = getTaskPriorityColor(task);
                 
                 let statusTag = '';
                 if (isCourseTask) {
@@ -3034,6 +3082,7 @@
                 return `
                     <div class="task-item ${task.completed ? 'completed' : ''} ${isActive ? 'active' : ''} ${isCourseTask ? 'course-task' : ''} ${attendance === 'attended' ? 'course-attended' : ''}" 
                          onclick="handleTaskClick('${task.id}')">
+                        <div class="task-priority-dot" style="background: ${priorityColor.color};"></div>
                         <div class="task-checkbox ${isCourseTask ? 'course-checkbox' : ''}" style="${isCourseTask ? 'cursor: default;' : ''}">
                             ${!isCourseTask ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '📚'}
                         </div>
