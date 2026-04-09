@@ -258,14 +258,6 @@
             gap: 12px;
         }
 
-        .task-priority-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
         .task-item {
             display: flex;
             align-items: center;
@@ -1094,13 +1086,6 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-        }
-
-        .week-priority-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            flex-shrink: 0;
         }
 
         .week-task-item {
@@ -2794,8 +2779,7 @@
                         </div>
                         <div class="week-day-tasks">
                             ${dayCourses.length > 0 ? dayCourses.map(c => `
-                                <div class="week-task-item ${c.completed ? 'completed' : ''}">
-                                    <span class="week-priority-dot" style="background: #FF6B6B;"></span>
+                                <div class="week-task-item ${c.completed ? 'completed' : ''}" style="border-left: 3px solid #FF6B6B;">
                                     <span style="flex: 1;">📚 ${c.name}</span>
                                     <span class="week-task-time">${c.time}</span>
                                 </div>
@@ -2803,8 +2787,7 @@
                             ${dayTasks.length > 0 ? dayTasks.map(t => {
                                 const color = getTaskPriorityColor(t);
                                 return `
-                                <div class="week-task-item ${t.completed || t.attendance === 'attended' ? 'completed' : ''}">
-                                    <span class="week-priority-dot" style="background: ${color.color};"></span>
+                                <div class="week-task-item ${t.completed || t.attendance === 'attended' ? 'completed' : ''}" style="border-left: 3px solid ${color.color};">
                                     <span style="flex: 1;">${t.name}</span>
                                     <span class="week-task-time">${t.startTime || ''}</span>
                                 </div>
@@ -3081,9 +3064,9 @@
                 
                 return `
                     <div class="task-item ${task.completed ? 'completed' : ''} ${isActive ? 'active' : ''} ${isCourseTask ? 'course-task' : ''} ${attendance === 'attended' ? 'course-attended' : ''}" 
+                         style="border-left: 4px solid ${priorityColor.color};"
                          onclick="handleTaskClick('${task.id}')">
-                        <div class="task-priority-dot" style="background: ${priorityColor.color};"></div>
-                        <div class="task-checkbox ${isCourseTask ? 'course-checkbox' : ''}" style="${isCourseTask ? 'cursor: default;' : ''}">
+                        <div class="task-checkbox ${isCourseTask ? 'course-checkbox' : ''}" style="${isCourseTask ? 'cursor: default;' : ''} ${!isCourseTask ? `border-color: ${priorityColor.color};` : ''}">
                             ${!isCourseTask ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '📚'}
                         </div>
                         <div class="task-content">
