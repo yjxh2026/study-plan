@@ -1687,15 +1687,24 @@
                 weeklyDaysGoal: 6,
                 reminderEnabled: false,
                 subjectAllocation: {
-                    '公共基础知识': 40,
-                    '三农综合写作': 25,
-                    '行测': 20,
-                    '申论': 10,
-                    '技能提升': 5
+                    '公共基础知识': 30,
+                    '三农综合写作': 20,
+                    'AI工具学习': 20,
+                    '新媒体运营': 15,
+                    '视频剪辑': 10,
+                    '信息流广告': 5
                 }
             },
-            categories: ['公共基础知识', '三农综合写作', '行测', '申论', '技能提升'],
-            tasks: [],
+            categories: ['公共基础知识', '三农综合写作', 'AI工具学习', '新媒体运营', '视频剪辑', '信息流广告'],
+            tasks: [
+                { id: 1, name: 'AI文案工具学习（Kimi/文心一言）', category: 'AI工具学习', completed: false, priority: 'high' },
+                { id: 2, name: 'AI图片生成入门（即梦/通义万相）', category: 'AI工具学习', completed: false, priority: 'high' },
+                { id: 3, name: '剪映AI功能实操', category: '视频剪辑', completed: false, priority: 'high' },
+                { id: 4, name: '抖音算法逻辑学习', category: '新媒体运营', completed: false, priority: 'medium' },
+                { id: 5, name: '小红书CES评分体系', category: '新媒体运营', completed: false, priority: 'medium' },
+                { id: 6, name: 'AI辅助脚本创作', category: 'AI工具学习', completed: false, priority: 'medium' },
+                { id: 7, name: '信息流广告基础概念', category: '信息流广告', completed: false, priority: 'low' }
+            ],
             timeRecords: [],
             reviews: [],
             courses: [],
