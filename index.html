@@ -14,8 +14,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="提升计划">
-    <!-- Chart.js 本地版本（用于离线支持） -->
-    <script src="chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #4A9FF5;
@@ -289,7 +288,7 @@
             height: 24px;
             border: 2px solid var(--border);
             border-radius: 50%;
-            margin-right: 8px;
+            margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1615,7 +1614,628 @@
             font-size: 11px;
             margin-top: 8px;
         }
-    </style>
+    
+        /* ===== 新增样式 ===== */
+        
+        /* 任务进度圆环 */
+        .task-progress-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: auto;
+            padding-left: 12px;
+        }
+        
+        .task-progress-ring {
+            width: 44px;
+            height: 44px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .task-progress-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .task-progress-ring .bg {
+            fill: none;
+            stroke: var(--bg);
+            stroke-width: 3;
+        }
+        
+        .task-progress-ring .progress {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.3s ease;
+        }
+        
+        .task-progress-ring .progress-warning {
+            stroke: var(--secondary);
+        }
+        
+        .task-progress-ring .progress-danger {
+            stroke: var(--danger);
+        }
+        
+        .task-progress-ring .percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .task-duration-info {
+            text-align: right;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+        
+        .task-actual-duration {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .task-plan-duration {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        
+        /* 计时结束弹窗 */
+        .timer-end-modal .modal-body {
+            text-align: center;
+            padding: 24px;
+        }
+        
+        .timer-end-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .timer-end-stat {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+        }
+        
+        .timer-end-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .timer-end-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .timer-end-ring {
+            margin: 20px auto;
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+        
+        .timer-end-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .timer-end-ring .bg {
+            fill: none;
+            stroke: var(--bg);
+            stroke-width: 3;
+        }
+        
+        .timer-end-ring .progress {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+        
+        .timer-end-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .timer-end-text .percentage {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .timer-end-text .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .timer-end-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        /* 复盘系统 */
+        .review-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .review-option-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .review-option {
+            padding: 12px;
+            background: var(--bg);
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .review-option:hover {
+            background: var(--border);
+        }
+        
+        .review-option.selected {
+            border-color: var(--primary);
+            background: rgba(74, 159, 245, 0.1);
+            color: var(--primary);
+        }
+        
+        .review-optional {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-left: 4px;
+        }
+        
+        .review-skip-hint {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        
+        /* 打断处理 */
+        .interruption-modal .interrupt-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .interrupt-type-btn {
+            padding: 12px;
+            background: var(--bg);
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .interrupt-type-btn:hover {
+            background: var(--border);
+        }
+        
+        .interrupt-type-btn.selected {
+            border-color: var(--primary);
+            background: rgba(74, 159, 245, 0.1);
+        }
+        
+        .interrupt-type-btn .icon {
+            font-size: 24px;
+        }
+        
+        .interrupt-type-btn .label {
+            font-size: 13px;
+        }
+        
+        .interruption-record {
+            padding: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .interruption-record .type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .interruption-record .duration {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        /* 目标对比 */
+        .goal-progress-card {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+        }
+        
+        .goal-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .goal-progress-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .goal-progress-value {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .goal-progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .goal-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .goal-progress-fill.excellent {
+            background: linear-gradient(90deg, var(--success), #52c41a);
+        }
+        
+        .goal-progress-fill.good {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+        
+        .goal-progress-fill.warning {
+            background: linear-gradient(90deg, var(--secondary), #fa8c16);
+        }
+        
+        .goal-progress-fill.danger {
+            background: linear-gradient(90deg, var(--danger), #ff4d4f);
+        }
+        
+        /* 目标设置 */
+        .goal-setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+        }
+        
+        .goal-setting-label {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .goal-setting-label .title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .goal-setting-label .subtitle {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        
+        .goal-setting-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .goal-setting-input input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .goal-setting-input .unit {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* 历史回顾 */
+        .history-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+        }
+        
+        .history-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .history-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .date-range-picker {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .date-range-picker input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+        }
+        
+        .history-detail-card {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+        }
+        
+        .history-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-detail-date {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .history-detail-total {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .history-task-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-task-item .name {
+            color: var(--text-primary);
+        }
+        
+        .history-task-item .duration {
+            color: var(--text-secondary);
+        }
+        
+        /* 待复盘列表 */
+        .pending-review-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pending-review-card:hover {
+            background: var(--border);
+        }
+        
+        .pending-review-card .info {
+            flex: 1;
+        }
+        
+        .pending-review-card .task-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .pending-review-card .task-meta {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+        
+        .pending-review-card .badge {
+            padding: 4px 8px;
+            background: rgba(255, 159, 67, 0.2);
+            color: var(--secondary);
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        /* 打卡提醒 */
+        .checkin-reminder {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .checkin-reminder:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 159, 245, 0.3);
+        }
+        
+        .checkin-reminder .icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .checkin-reminder .text {
+            flex: 1;
+        }
+        
+        .checkin-reminder .title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .checkin-reminder .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .checkin-reminder .arrow {
+            font-size: 18px;
+        }
+        
+        /* 净学习时长 */
+        .net-duration {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(46, 213, 115, 0.1);
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+        }
+        
+        .net-duration .label {
+            color: var(--success);
+            font-size: 13px;
+        }
+        
+        .net-duration .value {
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        /* 复盘历史视图增强 */
+        .review-entry-enhanced {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .review-entry-enhanced:hover {
+            background: var(--border);
+        }
+        
+        .review-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .review-entry-date {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .review-entry-tags {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .review-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .review-tag.focus-very {
+            background: rgba(46, 213, 115, 0.2);
+            color: var(--success);
+        }
+        
+        .review-tag.focus-normal {
+            background: rgba(74, 159, 245, 0.2);
+            color: var(--primary);
+        }
+        
+        .review-tag.focus-distracted {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--danger);
+        }
+        
+        .review-entry-summary {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .review-entry-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+</style>
 </head>
 <body>
     <!-- 侧边导航 - 桌面端 -->
@@ -1632,9 +2252,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             日历视图
         </div>
-        <div class="sidebar-item" data-page="weekplan">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="3" y1="14" x2="21" y2="14"/></svg>
-            周计划
+        <div class="sidebar-item" data-page="history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            历史回顾
         </div>
         <div class="sidebar-item" data-page="stats">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -1667,6 +2287,10 @@
         <div class="bottom-nav-item" data-page="calendar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             日历
+        </div>
+        <div class="bottom-nav-item" data-page="history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            历史
         </div>
         <div class="bottom-nav-item" data-page="stats">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -1796,8 +2420,7 @@
             <!-- 周学习视图 -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">📆 近7天学习打卡</span>
-                    <span class="card-subtitle" style="font-size: 11px; color: var(--text-light);">绿色表示当天有学习记录</span>
+                    <span class="card-title">📆 本周进度</span>
                 </div>
                 <div class="week-view" id="weekView"></div>
             </div>
@@ -1933,6 +2556,57 @@
                 <div class="achievement-grid" id="achievementGrid"></div>
             </div>
         </section>
+        <!-- 历史回顾页面 -->
+        <section class="page" id="page-history">
+            <div class="page-header">
+                <h1 class="page-title">📊 历史回顾</h1>
+                <p class="page-subtitle">回顾学习历程，分析成长轨迹</p>
+            </div>
+
+            <!-- 待复盘提醒 -->
+            <div id="pendingReviewReminder" style="display: none;" onclick="showPendingReviews()">
+                <div class="checkin-reminder">
+                    <span class="icon">📝</span>
+                    <div class="text">
+                        <div class="title">你有 <span id="pendingReviewCount">0</span> 个任务待复盘</div>
+                        <div class="subtitle">点击查看并补全复盘</div>
+                    </div>
+                    <span class="arrow">→</span>
+                </div>
+            </div>
+
+            <!-- 目标进度概览 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🎯 目标进度</span>
+                </div>
+                <div id="goalProgressOverview"></div>
+            </div>
+
+            <!-- 历史回顾Tab -->
+            <div class="card">
+                <div class="history-tabs">
+                    <div class="history-tab active" data-tab="week" onclick="switchHistoryTab('week')">本周</div>
+                    <div class="history-tab" data-tab="month" onclick="switchHistoryTab('month')">本月</div>
+                    <div class="history-tab" data-tab="custom" onclick="switchHistoryTab('custom')">自定义</div>
+                </div>
+                <div class="date-range-picker" id="customDateRange" style="display: none;">
+                    <input type="date" id="historyStartDate">
+                    <input type="date" id="historyEndDate">
+                    <button class="btn btn-primary" onclick="loadCustomHistory()">查询</button>
+                </div>
+                <div id="historyContent"></div>
+            </div>
+
+            <!-- 科目学习排行 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📚 科目学习排行</span>
+                </div>
+                <div id="subjectRanking" style="margin-top: 12px;"></div>
+            </div>
+        </section>
+
 
         <!-- 学习复盘页面 -->
         <section class="page" id="page-review">
@@ -1993,6 +2667,14 @@
                 <p class="page-subtitle">设定学习目标，科学规划时间</p>
             </div>
 
+            <!-- 目标进度概览 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📊 目标进度</span>
+                </div>
+                <div id="goalProgressCards"></div>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <span class="card-title">📊 基础目标</span>
@@ -2016,8 +2698,38 @@
                     </div>
                 </div>
                 <div class="goal-item">
+                    <span class="goal-label">自动计算周/月目标</span>
+                    <div class="toggle" id="toggleAutoCalculate" onclick="toggleAutoCalculate()"></div>
+                </div>
+                <div class="goal-item">
                     <span class="goal-label">每日目标时长提醒</span>
                     <div class="toggle" id="toggleReminder" onclick="toggleReminder()"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📊 高级目标（可选手动设置）</span>
+                </div>
+                <div class="goal-setting-row">
+                    <div class="goal-setting-label">
+                        <span class="title">周目标时长</span>
+                        <span class="subtitle">基于日目标自动计算或手动设置</span>
+                    </div>
+                    <div class="goal-setting-input">
+                        <input type="number" id="goalWeeklyHours" value="48" min="1" max="168">
+                        <span class="unit">小时/周</span>
+                    </div>
+                </div>
+                <div class="goal-setting-row">
+                    <div class="goal-setting-label">
+                        <span class="title">月目标时长</span>
+                        <span class="subtitle">基于日目标自动计算或手动设置</span>
+                    </div>
+                    <div class="goal-setting-input">
+                        <input type="number" id="goalMonthlyHours" value="200" min="1" max="720">
+                        <span class="unit">小时/月</span>
+                    </div>
                 </div>
             </div>
 
@@ -2238,6 +2950,163 @@
         </div>
     </div>
 
+    <!-- 计时结束弹窗 -->
+    <div class="modal-overlay" id="timerEndModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">🎉 学习完成</span>
+                <button class="modal-close" onclick="closeTimerEndModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="timer-end-ring">
+                    <svg viewBox="0 0 36 36">
+                        <circle class="bg" cx="18" cy="18" r="15.9"/>
+                        <circle class="progress" id="timerEndProgress" cx="18" cy="18" r="15.9" stroke-dasharray="0 100"/>
+                    </svg>
+                    <div class="timer-end-text">
+                        <div class="percentage" id="timerEndPercent">0%</div>
+                        <div class="label">目标进度</div>
+                    </div>
+                </div>
+                <div class="timer-end-stats">
+                    <div class="timer-end-stat">
+                        <div class="timer-end-stat-value" id="timerEndSession">0分钟</div>
+                        <div class="timer-end-stat-label">本次学习</div>
+                    </div>
+                    <div class="timer-end-stat">
+                        <div class="timer-end-stat-value" id="timerEndToday">0小时</div>
+                        <div class="timer-end-stat-label">今日累计</div>
+                    </div>
+                </div>
+                <div id="timerEndTaskInfo" style="margin-bottom: 12px; padding: 12px; background: var(--bg); border-radius: var(--radius-sm);">
+                    <div style="font-size: 14px; font-weight: 500;" id="timerEndTaskName"></div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                        <span id="timerEndTaskProgress"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="flex-direction: column;">
+                <div class="timer-end-buttons">
+                    <button class="btn btn-primary btn-block" onclick="goToQuickReview()">
+                        ✍️ 快速复盘
+                    </button>
+                    <button class="btn btn-secondary btn-block" onclick="goToTaskList()">
+                        ← 返回任务列表
+                    </button>
+                    <button class="btn btn-outline btn-block" onclick="goToStatsPage()">
+                        📊 查看统计
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速复盘弹窗 -->
+    <div class="modal-overlay" id="quickReviewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">✍️ 快速复盘</span>
+                <button class="modal-close" onclick="closeQuickReviewModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="review-skip-hint">
+                    💡 可以跳过，复盘也可以晚上统一做
+                </div>
+                <div class="review-form-group">
+                    <label class="form-label">今日学习状态</label>
+                    <div class="review-option-group" id="focusLevelOptions">
+                        <div class="review-option" data-value="very-focused" onclick="selectReviewOption(this, 'focusLevel')">
+                            😊 非常专注
+                        </div>
+                        <div class="review-option selected" data-value="focused" onclick="selectReviewOption(this, 'focusLevel')">
+                            🙂 比较专注
+                        </div>
+                        <div class="review-option" data-value="normal" onclick="selectReviewOption(this, 'focusLevel')">
+                            😐 一般
+                        </div>
+                        <div class="review-option" data-value="distracted" onclick="selectReviewOption(this, 'focusLevel')">
+                            😵 有些分心
+                        </div>
+                    </div>
+                </div>
+                <div class="review-form-group">
+                    <label class="form-label">知识点掌握程度</label>
+                    <div class="review-option-group" id="masteryLevelOptions">
+                        <div class="review-option" data-value="mastered" onclick="selectReviewOption(this, 'masteryLevel')">
+                            🎯 完全掌握
+                        </div>
+                        <div class="review-option selected" data-value="basic" onclick="selectReviewOption(this, 'masteryLevel')">
+                            📖 基本掌握
+                        </div>
+                        <div class="review-option" data-value="partial" onclick="selectReviewOption(this, 'masteryLevel')">
+                            📚 部分理解
+                        </div>
+                        <div class="review-option" data-value="need-review" onclick="selectReviewOption(this, 'masteryLevel')">
+                            🔄 需要复习
+                        </div>
+                    </div>
+                </div>
+                <div class="review-form-group">
+                    <label class="form-label">今日收获 <span class="review-optional">(可选)</span></label>
+                    <textarea class="form-textarea" id="quickReviewGains" placeholder="今天学到了什么？"></textarea>
+                </div>
+                <div class="review-form-group">
+                    <label class="form-label">明日计划 <span class="review-optional">(可选)</span></label>
+                    <textarea class="form-textarea" id="quickReviewPlan" placeholder="明天要重点学习什么？"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="skipQuickReview()">跳过</button>
+                <button class="btn btn-primary" onclick="saveQuickReview()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 打断处理弹窗 -->
+    <div class="modal-overlay" id="interruptionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">⏸️ 计时已暂停</span>
+                <button class="modal-close" onclick="closeInterruptionModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center; margin-bottom: 16px; color: var(--text-secondary);">
+                    检测到15分钟无操作，已自动暂停计时
+                </p>
+                <div class="review-form-group">
+                    <label class="form-label">暂停原因</label>
+                    <div class="interrupt-types">
+                        <div class="interrupt-type-btn" data-type="break" onclick="selectInterruptType(this)">
+                            <span class="icon">☕</span>
+                            <span class="label">短暂休息</span>
+                        </div>
+                        <div class="interrupt-type-btn" data-type="interrupted" onclick="selectInterruptType(this)">
+                            <span class="icon">📞</span>
+                            <span class="label">被打断</span>
+                        </div>
+                        <div class="interrupt-type-btn" data-type="switch" onclick="selectInterruptType(this)">
+                            <span class="icon">🔄</span>
+                            <span class="label">切换任务</span>
+                        </div>
+                        <div class="interrupt-type-btn" data-type="other" onclick="selectInterruptType(this)">
+                            <span class="icon">📝</span>
+                            <span class="label">其他</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="interruptNoteGroup" style="display: none;">
+                    <label class="form-label">补充说明</label>
+                    <input type="text" class="form-input" id="interruptNote" placeholder="可选：简单描述打断原因">
+                </div>
+                <div id="interruptionHistory" style="margin-top: 16px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="continueWithoutRecord()">继续计时</button>
+                <button class="btn btn-primary" onclick="confirmInterruption()">确认记录</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 查看复盘详情模态框 -->
     <div class="modal-overlay" id="reviewDetailModal">
         <div class="modal">
@@ -2295,10 +3164,6 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             标记缺勤
         </button>
-        <button class="task-action-btn" id="btnResetStatus" style="display:none" onclick="taskActionResetStatus()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            重置状态
-        </button>
         <button class="task-action-btn" onclick="closeTaskActionMenu()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             取消
@@ -2337,33 +3202,33 @@
             timeRecords: [],
             reviews: [],
             courses: [
-                { id: 1, name: '法律1', date: '2026-04-01', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 2, name: '法律2', date: '2026-04-02', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 3, name: '法律3', date: '2026-04-03', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 4, name: '综合写作1', date: '2026-04-04', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 5, name: '法律4', date: '2026-04-05', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 6, name: '综合写作2', date: '2026-04-06', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 7, name: '法律5', date: '2026-04-07', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 8, name: '综合写作3', date: '2026-04-08', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 9, name: '法律6', date: '2026-04-09', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 10, name: '法律7', date: '2026-04-10', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 11, name: '综合写作4', date: '2026-04-11', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 12, name: '综合写作5', date: '2026-04-13', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 13, name: '哲学1', date: '2026-04-15', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 14, name: '哲学2', date: '2026-04-16', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 15, name: '时政1', date: '2026-04-17', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 16, name: '时政2', date: '2026-04-19', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 17, name: '常识1', date: '2026-04-20', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 18, name: '时政3', date: '2026-04-21', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 19, name: '常识2', date: '2026-04-23', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 20, name: '时政4', date: '2026-04-24', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 21, name: '常识3', date: '2026-04-25', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 22, name: '省情1', date: '2026-04-27', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 23, name: '省情2', date: '2026-04-28', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 24, name: '时政5', date: '2026-04-29', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 25, name: '省情3', date: '2026-04-30', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 26, name: '经济1', date: '2026-05-06', time: '18:30', duration: 2, note: '线上课程', status: 'pending' },
-                { id: 27, name: '经济2', date: '2026-05-08', time: '18:30', duration: 2, note: '线上课程', status: 'pending' }
+                { id: 1, name: '法律1', date: '2026-04-01', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 2, name: '法律2', date: '2026-04-02', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 3, name: '法律3', date: '2026-04-03', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 4, name: '综合写作1', date: '2026-04-04', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 5, name: '法律4', date: '2026-04-05', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 6, name: '综合写作2', date: '2026-04-06', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 7, name: '法律5', date: '2026-04-07', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 8, name: '综合写作3', date: '2026-04-08', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 9, name: '法律6', date: '2026-04-09', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 10, name: '法律7', date: '2026-04-10', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 11, name: '综合写作4', date: '2026-04-11', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 12, name: '综合写作5', date: '2026-04-13', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 13, name: '哲学1', date: '2026-04-15', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 14, name: '哲学2', date: '2026-04-16', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 15, name: '时政1', date: '2026-04-17', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 16, name: '时政2', date: '2026-04-19', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 17, name: '常识1', date: '2026-04-20', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 18, name: '时政3', date: '2026-04-21', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 19, name: '常识2', date: '2026-04-23', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 20, name: '时政4', date: '2026-04-24', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 21, name: '常识3', date: '2026-04-25', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 22, name: '省情1', date: '2026-04-27', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 23, name: '省情2', date: '2026-04-28', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 24, name: '时政5', date: '2026-04-29', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 25, name: '省情3', date: '2026-04-30', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 26, name: '经济1', date: '2026-05-06', time: '18:30', duration: 2, note: '线上课程' },
+                { id: 27, name: '经济2', date: '2026-05-08', time: '18:30', duration: 2, note: '线上课程' }
             ],
             achievements: [],
             dataVersion: '2.0'
@@ -2392,6 +3257,27 @@
             });
             // 更新设置
             savedData.settings.subjectAllocation = defaultData.settings.subjectAllocation;
+            
+            // 升级到3.0: 添加新字段
+            if (!savedData.settings.autoCalculateGoals) {
+                savedData.settings.autoCalculateGoals = true;
+            }
+            if (!savedData.pendingReviewList) {
+                savedData.pendingReviewList = [];
+            }
+            
+            // 升级旧任务添加新字段
+            savedData.tasks.forEach(task => {
+                if (!task.interruptions) task.interruptions = [];
+                if (!task.netDuration) task.netDuration = 0;
+            });
+            
+            // 升级旧复盘添加新字段
+            savedData.reviews.forEach(review => {
+                if (!review.focusLevel) review.focusLevel = 'normal';
+                if (!review.masteryLevel) review.masteryLevel = 'basic';
+            });
+            
             savedData.dataVersion = defaultData.dataVersion;
             localStorage.setItem('studyPlannerData', JSON.stringify(savedData));
         }
@@ -2403,8 +3289,34 @@
             startTime: null,
             elapsedTime: 0,
             currentTaskId: null,
-            intervalId: null
+            intervalId: null,
+            lastActivityTime: Date.now(),
+            isPausedByInterruption: false
         };
+        
+        // 当前复盘状态
+        let currentQuickReview = {
+            taskId: null,
+            taskName: null,
+            duration: 0
+        };
+        
+        // 当前打断状态
+        let currentInterruption = {
+            type: null,
+            note: '',
+            startTime: null
+        };
+        
+        // 待复盘任务列表
+        let pendingReviews = [];
+        
+        // 历史回顾Tab状态
+        let currentHistoryTab = 'week';
+        
+        // 打断检测定时器
+        let inactivityTimer = null;
+        const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15分钟
 
         // 当前查看的月份（用于日历）
         let currentViewMonth = new Date();
@@ -2435,7 +3347,22 @@
             
             // 检查是否需要结束学习提醒
             checkEndDayReminder();
+            
+            // 初始化活动追踪
+            initActivityTracking();
         });
+        
+        // 活动追踪 - 用于打断检测
+        function initActivityTracking() {
+            const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+            events.forEach(event => {
+                document.addEventListener(event, () => {
+                    if (timerState.isRunning) {
+                        recordActivity();
+                    }
+                }, { passive: true });
+            });
+        }
 
         // ============ 智能任务生成 ============
         let currentTaskAction = null; // 当前操作的任务
@@ -2443,83 +3370,15 @@
         function generateDailyTasks() {
             const today = getTodayString();
             const todayAutoTasks = appData.tasks.filter(t => t.date === today && t.type === 'auto');
-            const todayCourseTasks = appData.tasks.filter(t => t.date === today && t.type === 'course');
+            
+            // 如果今天已经有自动生成的任务，不再重复生成
+            if (todayAutoTasks.length > 0) return;
             
             const todayCourses = appData.courses.filter(c => c.date === today);
             const hasCourseToday = todayCourses.length > 0;
-            const now = new Date();
-            const dayOfWeek = now.getDay();
+            const dayOfWeek = new Date(today).getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
             
-            // 如果今天没有任何自动生成的任务，生成完整任务列表
-            if (todayAutoTasks.length === 0) {
-                generateFullDailyTasks(today, todayCourses, hasCourseToday, isWeekend);
-                return;
-            }
-            
-            // 如果今天已有auto任务但缺少课程任务，补充课程任务
-            if (hasCourseToday && todayCourseTasks.length === 0) {
-                supplementCourseTasks(today, todayCourses);
-            }
-        }
-        
-        // 补充课程任务
-        function supplementCourseTasks(today, todayCourses) {
-            const newTasks = [];
-            
-            todayCourses.forEach(course => {
-                // 检查是否已有该课程的预习任务
-                const hasPreviewTask = appData.tasks.some(t => 
-                    t.date === today && 
-                    t.relatedCourseId === course.id && 
-                    t.name.includes('课前预习')
-                );
-                
-                // 如果没有预习任务，添加
-                if (!hasPreviewTask) {
-                    newTasks.push({
-                        id: generateId(),
-                        name: `课前预习 - ${course.name}`,
-                        category: '公共基础知识',
-                        date: today,
-                        startTime: '17:30',
-                        endTime: '18:30',
-                        duration: 60,
-                        priority: 'high',
-                        type: 'auto',
-                        relatedCourseId: course.id,
-                        completed: false
-                    });
-                }
-                
-                // 添加课程任务（特殊类型，不可勾选）
-                newTasks.push({
-                    id: generateId(),
-                    name: `📚 ${course.name}`,
-                    category: '线上课程',
-                    date: today,
-                    startTime: course.time || '18:30',
-                    endTime: addHours(course.time || '18:30', course.duration || 2),
-                    duration: (course.duration || 2) * 60,
-                    priority: 'high',
-                    type: 'course',
-                    relatedCourseId: course.id,
-                    completed: false,
-                    attendance: 'pending'
-                });
-            });
-            
-            if (newTasks.length > 0) {
-                newTasks.forEach(task => {
-                    appData.tasks.push(task);
-                });
-                saveData();
-                loadTasks();
-            }
-        }
-        
-        // 生成完整每日任务
-        function generateFullDailyTasks(today, todayCourses, hasCourseToday, isWeekend) {
             const newTasks = [];
             
             // 1. 固定时间块：上午三支一扶备考
@@ -2698,6 +3557,8 @@
                 loadGoals();
             } else if (pageName === 'weekplan') {
                 loadWeekPlan();
+            } else if (pageName === 'history') {
+                loadHistoryPage();
             }
         }
 
@@ -2721,7 +3582,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(startOfWeek);
                 d.setDate(startOfWeek.getDate() + i);
-                weekDates.push(formatDateLocal(d));
+                weekDates.push(d.toISOString().split('T')[0]);
             }
             
             const weekCourses = appData.courses.filter(c => weekDates.includes(c.date));
@@ -2790,19 +3651,19 @@
                         </div>
                         <div class="week-day-tasks">
                             ${dayCourses.length > 0 ? dayCourses.map(c => `
-                                <div class="week-task-item ${c.completed ? 'completed' : ''}" style="border-left: 3px solid #FF6B6B;">
-                                    <span style="flex: 1;">📚 ${c.name}</span>
+                                <div class="week-task-item ${c.completed ? 'completed' : ''}">
+                                    <span style="color: rgba(255,107,107,0.85);">📚</span>
+                                    <span style="flex: 1;">${c.name}</span>
                                     <span class="week-task-time">${c.time}</span>
                                 </div>
                             `).join('') : ''}
-                            ${dayTasks.length > 0 ? dayTasks.map(t => {
-                                const color = getTaskPriorityColor(t);
-                                return `
-                                <div class="week-task-item ${t.completed || t.attendance === 'attended' ? 'completed' : ''}" style="border-left: 3px solid ${color.color};">
+                            ${dayTasks.length > 0 ? dayTasks.map(t => `
+                                <div class="week-task-item ${t.completed || t.attendance === 'attended' ? 'completed' : ''}">
+                                    <span>${t.completed || t.attendance === 'attended' ? '✅' : '⭕'}</span>
                                     <span style="flex: 1;">${t.name}</span>
                                     <span class="week-task-time">${t.startTime || ''}</span>
                                 </div>
-                            `}).join('') : '<div style="font-size: 12px; color: var(--text-light); padding: 8px;">暂无任务</div>'}
+                            `).join('') : '<div style="font-size: 12px; color: var(--text-light); padding: 8px;">暂无任务</div>'}
                         </div>
                     </div>
                 `;
@@ -2823,7 +3684,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(startOfWeek);
                 d.setDate(startOfWeek.getDate() + i);
-                const dateStr = formatDateLocal(d);
+                const dateStr = d.toISOString().split('T')[0];
                 
                 // 检查是否已有任务
                 const existingTasks = appData.tasks.filter(t => t.date === dateStr && t.type === 'auto');
@@ -2966,53 +3827,10 @@
         }
 
         function getTodayString() {
-            // 使用本地时区获取日期，避免UTC时区偏移
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-        
-        // 格式化日期为 YYYY-MM-DD（本地时区）
-        function formatDateLocal(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            return new Date().toISOString().split('T')[0];
         }
 
         // ============ 任务管理 ============
-        // 任务优先级颜色配置
-        function getTaskPriorityColor(task) {
-            // 线上课程 - 红色（最高）
-            if (task.type === 'course' || task.category === '线上课程') {
-                return { color: '#FF6B6B', level: 1, label: '线上课程' };
-            }
-            // 三支一扶备考 - 橙红色
-            if (task.name.includes('三支一扶') || task.name.includes('课前预习')) {
-                return { color: '#FF8C42', level: 2, label: '三支一扶' };
-            }
-            // 公考备考 - 橙色
-            if (task.name.includes('公考') || task.name.includes('行测')) {
-                return { color: '#FFA940', level: 3, label: '公考备考' };
-            }
-            // AI学习 - 黄色
-            if (task.category === 'AI工具学习' || task.name.includes('AI') || task.name.includes('技能学习')) {
-                return { color: '#FFD93D', level: 4, label: 'AI学习' };
-            }
-            // 视频剪辑 - 蓝色（最低）
-            if (task.name.includes('视频') || task.name.includes('剪辑')) {
-                return { color: '#4A9FF5', level: 5, label: '视频剪辑' };
-            }
-            // 公共基础知识 - 橙红色（与三支一扶同级）
-            if (task.category === '公共基础知识') {
-                return { color: '#FF8C42', level: 2, label: '公共基础' };
-            }
-            // 默认 - 灰色
-            return { color: '#BFBFBF', level: 99, label: '其他' };
-        }
-        
         function loadTasks() {
             const today = getTodayString();
             const todayTasks = appData.tasks.filter(t => t.date === today);
@@ -3073,7 +3891,6 @@
                 const isCourseTask = task.type === 'course';
                 const attendance = task.attendance || 'pending';
                 const isActive = timerState.currentTaskId === task.id;
-                const priorityColor = getTaskPriorityColor(task);
                 
                 let statusTag = '';
                 if (isCourseTask) {
@@ -3086,11 +3903,28 @@
                     }
                 }
                 
+                // 计算进度
+                const actualDuration = task.actualDuration || 0;
+                const plannedDuration = (task.duration || 60) * 60; // 转换为秒
+                const progress = plannedDuration > 0 ? Math.min(100, (actualDuration / plannedDuration) * 100) : 0;
+                const circumference = 2 * Math.PI * 16;
+                const dashoffset = circumference - (progress / 100) * circumference;
+                
+                let progressClass = '';
+                if (progress >= 100) progressClass = 'progress-danger';
+                else if (progress >= 75) progressClass = 'progress-warning';
+                
+                const formatDurationShort = (seconds) => {
+                    if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
+                    const h = Math.floor(seconds / 3600);
+                    const m = Math.floor((seconds % 3600) / 60);
+                    return h + 'h' + (m > 0 ? m + 'm' : '');
+                };
+                
                 return `
                     <div class="task-item ${task.completed ? 'completed' : ''} ${isActive ? 'active' : ''} ${isCourseTask ? 'course-task' : ''} ${attendance === 'attended' ? 'course-attended' : ''}" 
-                         style="border-left: 4px solid ${priorityColor.color};"
                          onclick="handleTaskClick('${task.id}')">
-                        <div class="task-checkbox ${isCourseTask ? 'course-checkbox' : ''}" style="${isCourseTask ? 'cursor: default;' : ''} ${!isCourseTask ? `border-color: ${priorityColor.color};` : ''}">
+                        <div class="task-checkbox ${isCourseTask ? 'course-checkbox' : ''}" style="${isCourseTask ? 'cursor: default;' : ''}">
                             ${!isCourseTask ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '📚'}
                         </div>
                         <div class="task-content">
@@ -3098,6 +3932,21 @@
                             <div class="task-meta">
                                 <span class="task-tag">${task.category}</span>
                                 ${task.startTime ? `<span>${task.startTime}-${task.endTime}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="task-progress-wrapper">
+                            <div class="task-progress-ring">
+                                <svg viewBox="0 0 36 36">
+                                    <circle class="bg" cx="18" cy="18" r="16"/>
+                                    <circle class="progress ${progressClass}" cx="18" cy="18" r="16"
+                                        stroke-dasharray="${circumference}" 
+                                        stroke-dashoffset="${dashoffset}"/>
+                                </svg>
+                                <span class="percentage">${Math.round(progress)}%</span>
+                            </div>
+                            <div class="task-duration-info">
+                                <div class="task-actual-duration">${formatDurationShort(actualDuration)}</div>
+                                <div class="task-plan-duration">/ ${formatDurationShort(plannedDuration)}</div>
                             </div>
                         </div>
                     </div>
@@ -3123,31 +3972,17 @@
             
             // 根据任务类型显示不同按钮
             const isCourseTask = task.type === 'course';
-            const attendance = task.attendance || 'pending';
             const btnMarkAttended = document.getElementById('btnMarkAttended');
             const btnMarkAbsent = document.getElementById('btnMarkAbsent');
-            const btnResetStatus = document.getElementById('btnResetStatus');
             const btnMarkComplete = document.querySelector('.task-action-btn:nth-child(3)');
             
             if (isCourseTask) {
-                // 课程任务：根据当前状态显示不同按钮
-                if (attendance === 'pending') {
-                    // 待上课状态：显示标记按钮
-                    btnMarkAttended.style.display = 'flex';
-                    btnMarkAbsent.style.display = 'flex';
-                    btnResetStatus.style.display = 'none';
-                } else {
-                    // 已标记状态：显示重置按钮
-                    btnMarkAttended.style.display = 'none';
-                    btnMarkAbsent.style.display = 'none';
-                    btnResetStatus.style.display = 'flex';
-                    btnResetStatus.textContent = attendance === 'attended' ? '取消上课标记' : '取消缺勤标记';
-                }
+                btnMarkAttended.style.display = 'flex';
+                btnMarkAbsent.style.display = 'flex';
                 btnMarkComplete.style.display = 'none';
             } else {
                 btnMarkAttended.style.display = 'none';
                 btnMarkAbsent.style.display = 'none';
-                btnResetStatus.style.display = 'none';
                 btnMarkComplete.style.display = 'flex';
                 btnMarkComplete.textContent = task.completed ? '取消完成' : '标记完成';
             }
@@ -3219,23 +4054,6 @@
             closeTaskActionMenu();
             showToast('已标记缺勤');
         }
-        
-        function taskActionResetStatus() {
-            if (!currentTaskAction) return;
-            
-            // 重置课程任务状态
-            currentTaskAction.attendance = 'pending';
-            // 同时取消关联课程的完成状态
-            if (currentTaskAction.relatedCourseId) {
-                const course = appData.courses.find(c => c.id === currentTaskAction.relatedCourseId);
-                if (course) course.completed = false;
-            }
-            saveData();
-            loadTasks();
-            loadCourseStats();
-            closeTaskActionMenu();
-            showToast('已重置状态');
-        }
 
         function openAddTaskModal() {
             document.getElementById('taskName').value = '';
@@ -3292,8 +4110,12 @@
         function startTimer() {
             timerState.isRunning = true;
             timerState.startTime = Date.now() - timerState.elapsedTime;
+            timerState.lastActivityTime = Date.now();
             
             timerState.intervalId = setInterval(updateTimerDisplay, 1000);
+            
+            // 启动打断检测
+            startInactivityDetection();
         }
 
         function pauseTimer(save = false) {
@@ -3302,6 +4124,11 @@
                 clearInterval(timerState.intervalId);
                 timerState.isRunning = false;
                 
+                // 停止打断检测
+                if (inactivityTimer) {
+                    clearInterval(inactivityTimer);
+                }
+                
                 document.getElementById('playIcon').style.display = 'block';
                 document.getElementById('pauseIcon').style.display = 'none';
             }
@@ -3309,29 +4136,30 @@
             if (save && timerState.currentTaskId) {
                 const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
                 if (task) {
-                    task.actualDuration = (task.actualDuration || 0) + Math.floor(timerState.elapsedTime / 1000);
+                    const sessionDuration = Math.floor(timerState.elapsedTime / 1000);
+                    task.actualDuration = (task.actualDuration || 0) + sessionDuration;
                     
                     // 记录时间
                     const today = getTodayString();
                     const todayRecord = appData.timeRecords.find(r => r.date === today);
                     if (todayRecord) {
-                        todayRecord.duration += Math.floor(timerState.elapsedTime / 1000);
+                        todayRecord.duration += sessionDuration;
                         todayRecord.records.push({
                             taskId: task.id,
                             taskName: task.name,
                             category: task.category,
-                            duration: Math.floor(timerState.elapsedTime / 1000),
+                            duration: sessionDuration,
                             timestamp: Date.now()
                         });
                     } else {
                         appData.timeRecords.push({
                             date: today,
-                            duration: Math.floor(timerState.elapsedTime / 1000),
+                            duration: sessionDuration,
                             records: [{
                                 taskId: task.id,
                                 taskName: task.name,
                                 category: task.category,
-                                duration: Math.floor(timerState.elapsedTime / 1000),
+                                duration: sessionDuration,
                                 timestamp: Date.now()
                             }]
                         });
@@ -3340,6 +4168,9 @@
                     timerState.elapsedTime = 0;
                     saveData();
                     updateOverview();
+                    
+                    // 显示计时结束弹窗
+                    showTimerEndModal(sessionDuration);
                 }
             }
         }
@@ -3347,6 +4178,19 @@
         function updateTimerDisplay() {
             const elapsed = Date.now() - timerState.startTime;
             document.getElementById('timerDisplay').textContent = formatTime(elapsed);
+            
+            // 实时更新任务进度
+            if (timerState.currentTaskId) {
+                const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
+                if (task) {
+                    const currentSessionDuration = Math.floor(elapsed / 1000);
+                    const totalDuration = (task.actualDuration || 0) + currentSessionDuration;
+                    task.actualDuration = totalDuration;
+                }
+            }
+            
+            // 刷新任务列表显示进度
+            loadTasks();
         }
 
         function resetTimer() {
@@ -3365,12 +4209,8 @@
         }
 
         function stopTimer() {
+            // pauseTimer(true) 已经会显示计时结束弹窗，不需要再打开其他弹窗
             pauseTimer(true);
-            
-            // 弹出结束学习确认
-            const todayDuration = getTodayTotalDuration();
-            document.getElementById('endDayDuration').textContent = formatDuration(todayDuration);
-            openModal('endDayModal');
         }
 
         document.getElementById('btnPlayPause').addEventListener('click', function() {
@@ -3421,7 +4261,7 @@
             for (let i = 0; i < 365; i++) {
                 const checkDate = new Date(today);
                 checkDate.setDate(checkDate.getDate() - i);
-                const dateStr = formatDateLocal(checkDate);
+                const dateStr = checkDate.toISOString().split('T')[0];
                 
                 const record = appData.timeRecords.find(r => r.date === dateStr);
                 const hasActivity = record && record.duration > 0;
@@ -3462,7 +4302,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
-                const record = appData.timeRecords.find(r => r.date === formatDateLocal(d));
+                const record = appData.timeRecords.find(r => r.date === d.toISOString().split('T')[0]);
                 if (record) weekDuration += record.duration;
             }
             document.getElementById('statWeek').textContent = formatDuration(weekDuration);
@@ -3472,7 +4312,7 @@
             for (let i = 0; i < 30; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
-                const record = appData.timeRecords.find(r => r.date === formatDateLocal(d));
+                const record = appData.timeRecords.find(r => r.date === d.toISOString().split('T')[0]);
                 if (record) monthDuration += record.duration;
             }
             document.getElementById('statMonth').textContent = formatDuration(monthDuration);
@@ -3536,7 +4376,7 @@
             for (let i = 6; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
-                const dateStr = formatDateLocal(d);
+                const dateStr = d.toISOString().split('T')[0];
                 labels.push(d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }));
                 
                 const record = appData.timeRecords.find(r => r.date === dateStr);
@@ -3601,7 +4441,7 @@
                     const dayIndex = (weeks - 1 - w) * 7 + d;
                     const checkDate = new Date(today);
                     checkDate.setDate(checkDate.getDate() - dayIndex);
-                    const dateStr = formatDateLocal(checkDate);
+                    const dateStr = checkDate.toISOString().split('T')[0];
                     
                     const record = appData.timeRecords.find(r => r.date === dateStr);
                     const hours = record ? record.duration / 3600 : 0;
@@ -3660,7 +4500,7 @@
             for (let i = 0; i < 365; i++) {
                 const checkDate = new Date(today);
                 checkDate.setDate(checkDate.getDate() - i);
-                const dateStr = formatDateLocal(checkDate);
+                const dateStr = checkDate.toISOString().split('T')[0];
                 
                 const record = appData.timeRecords.find(r => r.date === dateStr);
                 if (record && record.duration > 0) {
@@ -3914,7 +4754,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - (6 - i));
-                const dateStr = formatDateLocal(d);
+                const dateStr = d.toISOString().split('T')[0];
                 const record = appData.timeRecords.find(r => r.date === dateStr);
                 const hasActivity = record && record.duration > 0;
                 
@@ -4069,7 +4909,7 @@
             });
             
             // 计算出勤率（已过日期的课程完成比例）
-            const today = getTodayString();
+            const today = new Date().toISOString().split('T')[0];
             const passedCourses = courses.filter(c => c.date <= today);
             const passedCompleted = passedCourses.filter(c => c.completed).length;
             const attendanceRate = passedCourses.length > 0 ? Math.round((passedCompleted / passedCourses.length) * 100) : 100;
@@ -4181,27 +5021,12 @@
                 return;
             }
 
-            // 获取课程状态配置
-            const statusConfig = {
-                'completed': { label: '已上完', class: 'status-completed', color: '#52c41a', icon: '✓' },
-                'in_progress': { label: '开始学，待完成', class: 'status-in-progress', color: '#faad14', icon: '◐' },
-                'pending': { label: '未完成', class: 'status-pending', color: '#d9d9d9', icon: '○' }
-            };
-
-            container.innerHTML = appData.courses.map(course => {
-                // 兼容旧数据：如果没有status字段，根据completed字段设置
-                if (!course.status) {
-                    course.status = course.completed ? 'completed' : 'pending';
-                }
-                
-                const status = statusConfig[course.status] || statusConfig['pending'];
-                
-                return `
-                <div class="task-item course-item ${status.class}" data-course-id="${course.id}">
-                    <div class="task-checkbox" style="border-color: ${status.color}; background: ${course.status === 'completed' ? status.color : 'transparent'};" onclick="cycleCourseStatus('${course.id}', event)">
-                        ${course.status === 'completed' ? '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : `<span style="color: ${status.color}; font-size: 12px;">${status.icon}</span>`}
+            container.innerHTML = appData.courses.map(course => `
+                <div class="task-item" onclick="toggleCourseComplete('${course.id}')">
+                    <div class="task-checkbox">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
-                    <div class="task-content" onclick="cycleCourseStatus('${course.id}', event)">
+                    <div class="task-content">
                         <div class="task-name">${course.name}</div>
                         <div class="task-meta">
                             <span class="task-tag tag-jiNeng">${course.date}</span>
@@ -4209,108 +5034,8 @@
                             ${course.note ? `<span>• ${course.note}</span>` : ''}
                         </div>
                     </div>
-                    <div class="course-status-badge" style="background: ${status.color}20; color: ${status.color}; padding: 2px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap;">
-                        ${status.label}
-                    </div>
                 </div>
-            `}).join('');
-            
-            // 更新课程进度统计
-            updateCourseStats();
-        }
-
-        function cycleCourseStatus(courseId, event) {
-            if (event) event.stopPropagation();
-            
-            const course = appData.courses.find(c => String(c.id) === String(courseId));
-            if (course) {
-                // 循环切换状态：pending -> in_progress -> completed -> pending
-                const statusOrder = ['pending', 'in_progress', 'completed'];
-                const currentIndex = statusOrder.indexOf(course.status || 'pending');
-                course.status = statusOrder[(currentIndex + 1) % statusOrder.length];
-                
-                // 兼容旧字段
-                course.completed = (course.status === 'completed');
-                
-                saveData();
-                loadCourses();
-                
-                const statusLabels = {
-                    'completed': '已上完',
-                    'in_progress': '开始学，待完成',
-                    'pending': '未完成'
-                };
-                showToast(`${course.name} → ${statusLabels[course.status]}`);
-            }
-        }
-
-        function updateCourseStats() {
-            const container = document.getElementById('courseStatsContainer');
-            if (!container) return;
-            
-            const courses = appData.courses;
-            const completed = courses.filter(c => c.status === 'completed').length;
-            const inProgress = courses.filter(c => c.status === 'in_progress').length;
-            const pending = courses.filter(c => c.status === 'pending' || !c.status).length;
-            const total = courses.length;
-            const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
-            
-            // 按科目分类统计
-            const categoryStats = {};
-            courses.forEach(c => {
-                const category = c.name.replace(/[0-9]/g, '').trim();
-                if (!categoryStats[category]) {
-                    categoryStats[category] = { total: 0, completed: 0 };
-                }
-                categoryStats[category].total++;
-                if (c.status === 'completed') {
-                    categoryStats[category].completed++;
-                }
-            });
-            
-            container.innerHTML = `
-                <div class="course-stats-overview">
-                    <div class="stat-ring">
-                        <svg class="circular-chart" viewBox="0 0 36 36">
-                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <path class="circle" stroke-dasharray="${progressPercent}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <text x="18" y="20.35" class="percentage">${progressPercent}%</text>
-                        </svg>
-                        <div class="stat-label" style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">总进度</div>
-                    </div>
-                    <div class="stat-details" style="flex: 1; margin-left: 20px;">
-                        <div class="stat-row" style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
-                            <span style="color: #52c41a;">✓ 已上完</span>
-                            <span><strong>${completed}</strong> / ${total}</span>
-                        </div>
-                        <div class="stat-row" style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
-                            <span style="color: #faad14;">◐ 进行中</span>
-                            <span><strong>${inProgress}</strong> / ${total}</span>
-                        </div>
-                        <div class="stat-row" style="display: flex; justify-content: space-between; padding: 8px 0;">
-                            <span style="color: #d9d9d9;">○ 未开始</span>
-                            <span><strong>${pending}</strong> / ${total}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="category-stats" style="margin-top: 16px;">
-                    <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">📊 各科目进度</h4>
-                    ${Object.entries(categoryStats).map(([cat, stats]) => {
-                        const catPercent = Math.round((stats.completed / stats.total) * 100);
-                        return `
-                            <div style="margin-bottom: 8px;">
-                                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                                    <span>${cat}</span>
-                                    <span style="color: var(--text-secondary);">${stats.completed}/${stats.total}</span>
-                                </div>
-                                <div style="height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden;">
-                                    <div style="height: 100%; width: ${catPercent}%; background: linear-gradient(90deg, #52c41a, #73d13d); border-radius: 3px; transition: width 0.3s;"></div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
+            `).join('');
         }
 
         function openAddCourseModal() {
@@ -4338,7 +5063,6 @@
                 date,
                 time,
                 note,
-                status: 'pending',
                 completed: false,
                 createdAt: Date.now()
             });
@@ -4350,8 +5074,12 @@
         }
 
         function toggleCourseComplete(courseId) {
-            // 保留旧函数兼容性，改为调用新函数
-            cycleCourseStatus(courseId);
+            const course = appData.courses.find(c => c.id === courseId);
+            if (course) {
+                course.completed = !course.completed;
+                saveData();
+                loadCourses();
+            }
         }
 
         // ============ 分类管理 ============
@@ -4513,132 +5241,619 @@
                 }
             });
         });
+    
 
-        // ============ PWA Service Worker 注册 ============
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then((registration) => {
-                        console.log('[App] Service Worker 注册成功:', registration.scope);
-                        
-                        // 检查更新
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // 发现新版本
-                                    showUpdateNotification();
-                                }
-                            });
-                        });
-                    })
-                    .catch((error) => {
-                        console.error('[App] Service Worker 注册失败:', error);
-                    });
-            });
-
-            // 监听离线/在线状态
-            window.addEventListener('online', handleOnline);
-            window.addEventListener('offline', handleOffline);
+        // ============ 计时结束体验优化 ============
+        function showTimerEndModal(sessionDuration) {
+            const todayDuration = getTodayTotalDuration();
+            const targetDuration = appData.settings.dailyHoursGoal * 3600;
+            const progressPercent = targetDuration > 0 ? Math.min(100, Math.round((todayDuration / targetDuration) * 100)) : 0;
             
-            // 页面加载时检查网络状态
-            if (!navigator.onLine) {
-                handleOffline();
+            // 更新显示
+            document.getElementById('timerEndSession').textContent = formatDuration(sessionDuration);
+            document.getElementById('timerEndToday').textContent = formatDuration(todayDuration);
+            document.getElementById('timerEndPercent').textContent = progressPercent + '%';
+            
+            // 更新进度环
+            const progressPath = document.getElementById('timerEndProgress');
+            progressPath.setAttribute('stroke-dasharray', progressPercent + ', 100');
+            
+            // 更新任务信息
+            if (timerState.currentTaskId) {
+                const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
+                if (task) {
+                    document.getElementById('timerEndTaskName').textContent = task.name;
+                    const actualDuration = task.actualDuration || 0;
+                    const plannedDuration = task.duration || 60;
+                    document.getElementById('timerEndTaskProgress').textContent = 
+                        `已学 ${formatDuration(actualDuration)} / 计划 ${formatDuration(plannedDuration * 60)}`;
+                }
             }
+            
+            openModal('timerEndModal');
         }
-
-        // 网络恢复
-        function handleOnline() {
-            const offlineBanner = document.getElementById('offlineBanner');
-            if (offlineBanner) {
-                offlineBanner.classList.remove('show');
-                // 显示恢复提示
-                showToast('🌐 网络已恢复', 'success');
+        
+        function closeTimerEndModal() {
+            closeModal('timerEndModal');
+        }
+        
+        function goToQuickReview() {
+            closeTimerEndModal();
+            if (timerState.currentTaskId) {
+                const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
+                if (task) {
+                    currentQuickReview = {
+                        taskId: task.id,
+                        taskName: task.name,
+                        duration: task.actualDuration || 0
+                    };
+                }
             }
+            openModal('quickReviewModal');
         }
-
-        // 网络断开
-        function handleOffline() {
-            const offlineBanner = document.getElementById('offlineBanner');
-            if (offlineBanner) {
-                offlineBanner.classList.add('show');
+        
+        function goToTaskList() {
+            closeTimerEndModal();
+            resetTimer();
+        }
+        
+        function goToStatsPage() {
+            closeTimerEndModal();
+            resetTimer();
+            switchPage('stats');
+        }
+        
+        // ============ 快速复盘功能 ============
+        function closeQuickReviewModal() {
+            closeModal('quickReviewModal');
+        }
+        
+        function selectReviewOption(el, type) {
+            const group = el.parentElement;
+            group.querySelectorAll('.review-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function saveQuickReview() {
+            const focusLevelEl = document.querySelector('#focusLevelOptions .review-option.selected');
+            const masteryLevelEl = document.querySelector('#masteryLevelOptions .review-option.selected');
+            
+            const focusLevel = focusLevelEl ? focusLevelEl.dataset.value : 'normal';
+            const masteryLevel = masteryLevelEl ? masteryLevelEl.dataset.value : 'basic';
+            const gains = document.getElementById('quickReviewGains').value.trim();
+            const tomorrowPlan = document.getElementById('quickReviewPlan').value.trim();
+            
+            const review = {
+                id: generateId(),
+                date: getTodayString(),
+                taskId: currentQuickReview.taskId,
+                taskName: currentQuickReview.taskName,
+                studyDuration: currentQuickReview.duration,
+                focusLevel: focusLevel,
+                masteryLevel: masteryLevel,
+                gains: gains,
+                weakness: '',
+                tomorrowPlan: tomorrowPlan,
+                createdAt: Date.now(),
+                reviewedAt: Date.now()
+            };
+            
+            // 添加到复盘列表
+            const existingIndex = appData.reviews.findIndex(r => r.date === getTodayString());
+            if (existingIndex >= 0) {
+                // 合并复盘
+                appData.reviews[existingIndex] = {
+                    ...appData.reviews[existingIndex],
+                    ...review,
+                    reviewedAt: Date.now()
+                };
+            } else {
+                appData.reviews.push(review);
             }
+            
+            // 标记任务已复盘
+            if (currentQuickReview.taskId) {
+                const task = appData.tasks.find(t => t.id === currentQuickReview.taskId);
+                if (task) {
+                    task.reviewed = true;
+                }
+            }
+            
+            saveData();
+            closeQuickReviewModal();
+            showToast('复盘已保存');
+            
+            // 清空表单
+            document.getElementById('quickReviewGains').value = '';
+            document.getElementById('quickReviewPlan').value = '';
         }
-
-        // 显示更新提示
-        function showUpdateNotification() {
-            showToast('📱 发现新版本，刷新页面以更新', 'info');
+        
+        function skipQuickReview() {
+            closeQuickReviewModal();
+            // 添加到待复盘列表
+            if (currentQuickReview.taskId) {
+                if (!appData.pendingReviewList) {
+                    appData.pendingReviewList = [];
+                }
+                if (!appData.pendingReviewList.find(r => r.taskId === currentQuickReview.taskId)) {
+                    appData.pendingReviewList.push({
+                        taskId: currentQuickReview.taskId,
+                        taskName: currentQuickReview.taskName,
+                        duration: currentQuickReview.duration,
+                        timestamp: Date.now()
+                    });
+                    saveData();
+                }
+            }
+            showToast('已跳过，可晚上统一复盘');
         }
-
-        // 清除缓存并重新加载
-        function clearCacheAndReload() {
-            if ('caches' in window) {
-                caches.keys().then(names => {
-                    names.forEach(name => caches.delete(name));
+        
+        // ============ 打断处理功能 ============
+        function startInactivityDetection() {
+            // 重置计时
+            timerState.lastActivityTime = Date.now();
+            
+            // 清除之前的定时器
+            if (inactivityTimer) {
+                clearInterval(inactivityTimer);
+            }
+            
+            // 每分钟检查一次
+            inactivityTimer = setInterval(() => {
+                if (timerState.isRunning) {
+                    const idleTime = Date.now() - timerState.lastActivityTime;
+                    if (idleTime >= INACTIVITY_TIMEOUT && !timerState.isPausedByInterruption) {
+                        pauseTimer(false);
+                        timerState.isPausedByInterruption = true;
+                        showInterruptionModal();
+                    }
+                }
+            }, 60000);
+        }
+        
+        function recordActivity() {
+            timerState.lastActivityTime = Date.now();
+        }
+        
+        function showInterruptionModal() {
+            // 显示打断历史
+            const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
+            if (task && task.interruptions && task.interruptions.length > 0) {
+                const historyHtml = task.interruptions.slice(-3).map(int => `
+                    <div class="interruption-record">
+                        <div class="type">
+                            <span>${getInterruptIcon(int.type)}</span>
+                            <span>${getInterruptLabel(int.type)}</span>
+                        </div>
+                        <span class="duration">${formatDuration(int.duration)}</span>
+                    </div>
+                `).join('');
+                document.getElementById('interruptionHistory').innerHTML = 
+                    '<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">最近打断记录：</div>' + historyHtml;
+            } else {
+                document.getElementById('interruptionHistory').innerHTML = '';
+            }
+            
+            currentInterruption = {
+                type: null,
+                note: '',
+                startTime: Date.now()
+            };
+            
+            openModal('interruptionModal');
+        }
+        
+        function selectInterruptType(el) {
+            document.querySelectorAll('.interrupt-type-btn').forEach(btn => btn.classList.remove('selected'));
+            el.classList.add('selected');
+            currentInterruption.type = el.dataset.type;
+            
+            // 显示备注输入框
+            document.getElementById('interruptNoteGroup').style.display = 
+                currentInterruption.type === 'other' ? 'block' : 'none';
+        }
+        
+        function getInterruptIcon(type) {
+            const icons = {
+                'break': '☕',
+                'interrupted': '📞',
+                'switch': '🔄',
+                'other': '📝'
+            };
+            return icons[type] || '📝';
+        }
+        
+        function getInterruptLabel(type) {
+            const labels = {
+                'break': '短暂休息',
+                'interrupted': '被打断',
+                'switch': '切换任务',
+                'other': '其他'
+            };
+            return labels[type] || '其他';
+        }
+        
+        function confirmInterruption() {
+            const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
+            if (task) {
+                if (!task.interruptions) {
+                    task.interruptions = [];
+                }
+                
+                const duration = currentInterruption.startTime ? 
+                    Math.floor((Date.now() - currentInterruption.startTime) / 1000) : 0;
+                
+                task.interruptions.push({
+                    time: Date.now(),
+                    type: currentInterruption.type || 'other',
+                    duration: duration,
+                    note: document.getElementById('interruptNote').value.trim()
                 });
+                
+                // 更新净学习时长
+                task.netDuration = (task.netDuration || 0) + (task.actualDuration || 0) - duration;
+                
+                saveData();
             }
-            location.reload();
+            
+            closeModal('interruptionModal');
+            timerState.isPausedByInterruption = false;
+            showToast('打断已记录');
         }
-    </script>
-
-    <!-- 离线提示横幅 -->
-    <div id="offlineBanner" class="offline-banner">
-        <div class="offline-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="offline-icon">
-                <line x1="1" y1="1" x2="23" y2="23"/>
-                <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
-                <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
-                <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
-                <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
-                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-                <line x1="12" y1="20" x2="12.01" y2="20"/>
-            </svg>
-            <span>📴 当前处于离线模式，您仍可使用已缓存的功能和数据</span>
-        </div>
-    </div>
-
-    <!-- 离线提示横幅样式 -->
-    <style>
-        .offline-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(135deg, #FF9F43, #FF6B6B);
-            color: white;
-            padding: 12px 16px;
-            text-align: center;
-            font-size: 14px;
-            z-index: 10000;
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .offline-banner.show {
-            transform: translateY(0);
-        }
-
-        .offline-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .offline-icon {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-
-        @media (min-width: 768px) {
-            .offline-banner {
-                top: env(titlebar-area-y, 0);
+        
+        function continueWithoutRecord() {
+            closeModal('interruptionModal');
+            timerState.isPausedByInterruption = false;
+            // 继续计时
+            if (timerState.currentTaskId) {
+                startTimer();
+                document.getElementById('playIcon').style.display = 'none';
+                document.getElementById('pauseIcon').style.display = 'block';
             }
         }
-    </style>
+        
+        // ============ 任务卡片进度展示 ============
+        function getTaskProgressRing(task) {
+            const actualDuration = task.actualDuration || 0;
+            const plannedDuration = (task.duration || 60) * 60; // 转换为秒
+            const progress = plannedDuration > 0 ? Math.min(100, (actualDuration / plannedDuration) * 100) : 0;
+            
+            let progressClass = '';
+            if (progress >= 100) {
+                progressClass = 'progress-danger';
+            } else if (progress >= 75) {
+                progressClass = 'progress-warning';
+            }
+            
+            const circumference = 2 * Math.PI * 16;
+            const dashoffset = circumference * (1 - progress / 100);
+            
+            return {
+                progress,
+                progressClass,
+                circumference,
+                dashoffset,
+                actualDuration,
+                plannedDuration
+            };
+        }
+        
+        function renderTaskProgressRingHTML(task) {
+            const ring = getTaskProgressRing(task);
+            return `
+                <div class="task-progress-ring">
+                    <svg viewBox="0 0 36 36">
+                        <circle class="bg" cx="18" cy="18" r="16"/>
+                        <circle class="progress ${ring.progressClass}" cx="18" cy="18" r="16"
+                            stroke-dasharray="${ring.circumference}" 
+                            stroke-dashoffset="${ring.dashoffset}"/>
+                    </svg>
+                    <span class="percentage">${Math.round(ring.progress)}%</span>
+                </div>
+                <div class="task-duration-info">
+                    <div class="task-actual-duration">${formatDuration(ring.actualDuration)}</div>
+                    <div class="task-plan-duration">/ ${formatDuration(ring.plannedDuration)}</div>
+                </div>
+            `;
+        }
+        
+        // ============ 历史回顾功能 ============
+        function loadHistoryPage() {
+            loadPendingReviewReminder();
+            loadGoalProgressOverview();
+            loadHistoryContent('week');
+            loadSubjectRanking();
+        }
+        
+        function loadPendingReviewReminder() {
+            const container = document.getElementById('pendingReviewReminder');
+            const countEl = document.getElementById('pendingReviewCount');
+            
+            // 从待复盘列表中获取今日未复盘的任务
+            pendingReviews = [];
+            if (appData.pendingReviewList) {
+                const today = getTodayString();
+                pendingReviews = appData.pendingReviewList.filter(r => 
+                    !r.reviewed && r.timestamp >= new Date(today).getTime()
+                );
+            }
+            
+            if (pendingReviews.length > 0) {
+                container.style.display = 'block';
+                countEl.textContent = pendingReviews.length;
+            } else {
+                container.style.display = 'none';
+            }
+        }
+        
+        function showPendingReviews() {
+            // 显示待复盘列表
+            const pendingList = pendingReviews.map(r => `
+                <div class="pending-review-card" onclick="openQuickReviewFor('${r.taskId}')">
+                    <div class="info">
+                        <div class="task-name">${r.taskName}</div>
+                        <div class="task-meta">${formatDuration(r.duration)} · ${new Date(r.timestamp).toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                    <span class="badge">待复盘</span>
+                </div>
+            `).join('');
+            
+            // 在当前页面显示
+            const content = document.getElementById('historyContent');
+            content.innerHTML = `
+                <h4 style="margin-bottom: 12px;">待复盘任务</h4>
+                ${pendingList}
+            `;
+        }
+        
+        function openQuickReviewFor(taskId) {
+            const task = appData.tasks.find(t => t.id === taskId);
+            if (task) {
+                currentQuickReview = {
+                    taskId: task.id,
+                    taskName: task.name,
+                    duration: task.actualDuration || 0
+                };
+                openModal('quickReviewModal');
+            }
+        }
+        
+        function loadGoalProgressOverview() {
+            const container = document.getElementById('goalProgressOverview');
+            const today = getTodayString();
+            
+            // 日目标
+            const todayDuration = getTodayTotalDuration();
+            const dailyGoal = appData.settings.dailyHoursGoal * 3600;
+            const dailyPercent = dailyGoal > 0 ? Math.min(100, (todayDuration / dailyGoal) * 100) : 0;
+            
+            // 周目标
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            let weekDuration = 0;
+            for (let i = 0; i <= weekStart.getDay(); i++) {
+                const d = new Date(weekStart);
+                d.setDate(d.getDate() + i);
+                const record = appData.timeRecords.find(r => r.date === formatDateLocal(d));
+                if (record) weekDuration += record.duration;
+            }
+            const weeklyGoal = (appData.settings.dailyHoursGoal || 8) * 3600 * 7;
+            const weeklyPercent = weeklyGoal > 0 ? Math.min(100, (weekDuration / weeklyGoal) * 100) : 0;
+            
+            // 月目标
+            const monthStart = new Date();
+            monthStart.setDate(1);
+            let monthDuration = 0;
+            for (let d = new Date(monthStart); d <= new Date(); d.setDate(d.getDate() + 1)) {
+                const record = appData.timeRecords.find(r => r.date === formatDateLocal(d));
+                if (record) monthDuration += record.duration;
+            }
+            const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+            const monthlyGoal = (appData.settings.dailyHoursGoal || 8) * 3600 * daysInMonth;
+            const monthlyPercent = monthlyGoal > 0 ? Math.min(100, (monthDuration / monthlyGoal) * 100) : 0;
+            
+            container.innerHTML = `
+                ${renderGoalProgressCard('日目标', todayDuration, dailyGoal, dailyPercent)}
+                ${renderGoalProgressCard('周目标', weekDuration, weeklyGoal, weeklyPercent)}
+                ${renderGoalProgressCard('月目标', monthDuration, monthlyGoal, monthlyPercent)}
+            `;
+        }
+        
+        function renderGoalProgressCard(title, current, target, percent) {
+            let fillClass = 'warning';
+            if (percent >= 100) fillClass = 'excellent';
+            else if (percent >= 75) fillClass = 'good';
+            else if (percent >= 50) fillClass = 'warning';
+            else fillClass = 'danger';
+            
+            return `
+                <div class="goal-progress-card">
+                    <div class="goal-progress-header">
+                        <span class="goal-progress-title">${title}</span>
+                        <span class="goal-progress-value">${formatDuration(current)} / ${formatDuration(target)}</span>
+                    </div>
+                    <div class="goal-progress-bar">
+                        <div class="goal-progress-fill ${fillClass}" style="width: ${percent}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function switchHistoryTab(tab) {
+            currentHistoryTab = tab;
+            document.querySelectorAll('.history-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tab);
+            });
+            
+            const customRange = document.getElementById('customDateRange');
+            customRange.style.display = tab === 'custom' ? 'flex' : 'none';
+            
+            if (tab !== 'custom') {
+                loadHistoryContent(tab);
+            }
+        }
+        
+        function loadHistoryContent(tab) {
+            const container = document.getElementById('historyContent');
+            let dateRange = [];
+            
+            if (tab === 'week') {
+                const today = new Date();
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+                    dateRange.push(formatDateLocal(d));
+                }
+            } else if (tab === 'month') {
+                const today = new Date();
+                for (let i = 29; i >= 0; i--) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+                    dateRange.push(formatDateLocal(d));
+                }
+            }
+            
+            if (dateRange.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>请选择日期范围</p></div>';
+                return;
+            }
+            
+            // 获取每日详情
+            const dailyData = dateRange.map(date => {
+                const record = appData.timeRecords.find(r => r.date === date);
+                return {
+                    date,
+                    totalDuration: record ? record.duration : 0,
+                    records: record ? record.records : []
+                };
+            }).filter(d => d.totalDuration > 0);
+            
+            if (dailyData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>暂无学习记录</p></div>';
+                return;
+            }
+            
+            // 渲染每日详情
+            container.innerHTML = dailyData.map(day => {
+                const dateObj = new Date(day.date);
+                const dateStr = dateObj.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', weekday: 'short' });
+                const review = appData.reviews.find(r => r.date === day.date);
+                
+                const taskItems = day.records.slice(0, 5).map(r => `
+                    <div class="history-task-item">
+                        <span class="name">${r.taskName}</span>
+                        <span class="duration">${formatDuration(r.duration)}</span>
+                    </div>
+                `).join('');
+                
+                return `
+                    <div class="history-detail-card">
+                        <div class="history-detail-header">
+                            <span class="history-detail-date">${dateStr}</span>
+                            <span class="history-detail-total">${formatDuration(day.totalDuration)}</span>
+                        </div>
+                        ${taskItems}
+                        ${review ? `
+                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-secondary);">
+                                💡 ${review.gains || '已复盘'}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function loadCustomHistory() {
+            const startDate = document.getElementById('historyStartDate').value;
+            const endDate = document.getElementById('historyEndDate').value;
+            
+            if (!startDate || !endDate) {
+                showToast('请选择日期范围');
+                return;
+            }
+            
+            const container = document.getElementById('historyContent');
+            const dateRange = [];
+            
+            let current = new Date(startDate);
+            const end = new Date(endDate);
+            while (current <= end) {
+                dateRange.push(formatDateLocal(current));
+                current.setDate(current.getDate() + 1);
+            }
+            
+            const dailyData = dateRange.map(date => {
+                const record = appData.timeRecords.find(r => r.date === date);
+                return {
+                    date,
+                    totalDuration: record ? record.duration : 0,
+                    records: record ? record.records : []
+                };
+            }).filter(d => d.totalDuration > 0);
+            
+            if (dailyData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>所选日期范围内暂无学习记录</p></div>';
+                return;
+            }
+            
+            container.innerHTML = dailyData.map(day => {
+                const dateObj = new Date(day.date);
+                const dateStr = dateObj.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', weekday: 'short' });
+                
+                return `
+                    <div class="history-detail-card">
+                        <div class="history-detail-header">
+                            <span class="history-detail-date">${dateStr}</span>
+                            <span class="history-detail-total">${formatDuration(day.totalDuration)}</span>
+                        </div>
+                        ${day.records.slice(0, 5).map(r => `
+                            <div class="history-task-item">
+                                <span class="name">${r.taskName}</span>
+                                <span class="duration">${formatDuration(r.duration)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function loadSubjectRanking() {
+            const container = document.getElementById('subjectRanking');
+            const categoryDuration = {};
+            
+            appData.timeRecords.forEach(record => {
+                record.records.forEach(r => {
+                    categoryDuration[r.category] = (categoryDuration[r.category] || 0) + r.duration;
+                });
+            });
+            
+            const sorted = Object.entries(categoryDuration)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+            
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>暂无数据</p></div>';
+                return;
+            }
+            
+            const maxDuration = sorted[0][1];
+            
+            container.innerHTML = sorted.map(([category, duration], index) => {
+                const percent = (duration / maxDuration) * 100;
+                return `
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span style="font-size: 13px;">${index + 1}. ${category}</span>
+                            <span style="font-size: 13px; color: var(--text-secondary);">${formatDuration(duration)}</span>
+                        </div>
+                        <div style="height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden;">
+                            <div style="height: 100%; width: ${percent}%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+</script>
 </body>
 </html>
