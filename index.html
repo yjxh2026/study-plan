@@ -2854,18 +2854,18 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.1.0 <span style="color: var(--success);">最新</span></p>
+                    <p>版本：v3.1.1 <span style="color: var(--success);">最新</span></p>
                     <p>更新日期：2026-04-10</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.1.0 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.1.1 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>每分钟自动保存进度（防止丢失）</li>
+                            <li>修复自动保存时计时器重置问题</li>
+                            <li>自动保存改为后台运行（不影响计时显示）</li>
+                            <li>每10分钟自动保存进度</li>
                             <li>切换任务时自动保存当前进度</li>
-                            <li>15分钟无操作自动停止并保存</li>
                             <li>碎片化计时支持（同一任务多次累计）</li>
-                            <li>短时间计时也可保存（5秒以上）</li>
                         </ul>
                     </div>
                 </div>
@@ -3339,25 +3339,29 @@
             intervalId: null,
             lastActivityTime: Date.now(),
             isPausedByInterruption: false,
-            autoSaveIntervalId: null  // 自动保存定时器
+            autoSaveIntervalId: null,  // 自动保存定时器
+            lastAutoSaveTime: null     // 上次自动保存的时间点
         };
         
         // ============ 计时状态持久化 ============
         const TIMER_STATE_KEY = 'studyPlanTimerState';
         
-        // ============ 自动保存进度（每分钟） ============
+        // ============ 自动保存进度（每10分钟） ============
         function startAutoSave() {
             // 清除之前的定时器
             if (timerState.autoSaveIntervalId) {
                 clearInterval(timerState.autoSaveIntervalId);
             }
             
-            // 每分钟保存一次当前进度
+            // 记录开始时间点（用于计算增量）
+            timerState.lastAutoSaveTime = Date.now();
+            
+            // 每10分钟保存一次当前进度（后台运行，不打断计时）
             timerState.autoSaveIntervalId = setInterval(() => {
                 if (timerState.isRunning && timerState.currentTaskId) {
                     autoSaveProgress();
                 }
-            }, 60000); // 60秒
+            }, 600000); // 10分钟 = 600秒
         }
         
         function stopAutoSave() {
@@ -3365,6 +3369,7 @@
                 clearInterval(timerState.autoSaveIntervalId);
                 timerState.autoSaveIntervalId = null;
             }
+            timerState.lastAutoSaveTime = null;
         }
         
         function autoSaveProgress() {
@@ -3373,27 +3378,27 @@
             const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
             if (!task) return;
             
-            // 计算本次会话时长（秒）
-            const currentElapsed = Date.now() - timerState.startTime;
-            const sessionSeconds = Math.floor(currentElapsed / 1000);
+            // 计算从上次保存到现在的增量时长（秒）
+            const now = Date.now();
+            const incrementSeconds = Math.floor((now - timerState.lastAutoSaveTime) / 1000);
             
             // 累加到任务进度
-            task.actualDuration = (task.actualDuration || 0) + sessionSeconds;
-            
-            // 重置计时起点（避免重复累加）
-            timerState.startTime = Date.now();
-            timerState.elapsedTime = 0;
+            task.actualDuration = (task.actualDuration || 0) + incrementSeconds;
             
             // 更新今日记录
-            updateTodayRecord(task, sessionSeconds);
+            updateTodayRecord(task, incrementSeconds);
+            
+            // 更新上次保存时间点（不重置计时器，继续计时）
+            timerState.lastAutoSaveTime = now;
             
             // 保存数据
             saveData();
             
-            // 刷新显示
+            // 刷新任务列表显示
             loadTasks();
             
-            showToast('进度已自动保存');
+            // 静默提示（不打断计时）
+            console.log(`[自动保存] ${task.name} 累计保存 ${Math.floor(incrementSeconds / 60)} 分钟，总进度 ${Math.floor(task.actualDuration / 60)} 分钟`);
         }
         
         function updateTodayRecord(task, sessionSeconds) {
