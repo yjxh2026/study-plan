@@ -4,7 +4,7 @@
  */
 
 // 缓存版本控制
-const CACHE_NAME = 'study-plan-v3-20260410-1530';
+const CACHE_NAME = 'study-plan-v3.0.0-20260410';
 
 // 需要缓存的资源列表
 const ASSETS_TO_CACHE = [
