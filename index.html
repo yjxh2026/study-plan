@@ -2854,16 +2854,16 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.2.2 <span style="color: var(--success);">最新</span></p>
+                    <p>版本：v3.2.3 <span style="color: var(--success);">最新</span></p>
                     <p>更新日期：2026-04-11</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.2 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.3 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>修复任务重复生成问题</li>
-                            <li>删除冗余的默认任务逻辑</li>
-                            <li>统一使用时间块任务管理</li>
+                            <li>新增任务删除功能</li>
+                            <li>点击任务卡片可弹出操作菜单</li>
+                            <li>支持删除重复或不需要的任务</li>
                         </ul>
                     </div>
                 </div>
@@ -3208,6 +3208,10 @@
         <button class="task-action-btn danger" id="btnMarkAbsent" style="display:none" onclick="taskActionMarkAbsent()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             标记缺勤
+        </button>
+        <button class="task-action-btn danger" id="btnDeleteTask" onclick="taskActionDelete()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            删除任务
         </button>
         <button class="task-action-btn" onclick="closeTaskActionMenu()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -4520,6 +4524,26 @@
             loadTasks();
             closeTaskActionMenu();
             showToast('已标记缺勤');
+        }
+        
+        function taskActionDelete() {
+            if (!currentTaskAction) return;
+            
+            const taskName = currentTaskAction.name;
+            const taskId = currentTaskAction.id;
+            
+            // 如果正在计时该任务，先停止计时
+            if (timerState.currentTaskId === taskId) {
+                resetTimer();
+            }
+            
+            // 从任务列表中删除
+            appData.tasks = appData.tasks.filter(t => t.id !== taskId);
+            saveData();
+            loadTasks();
+            updateOverview();
+            closeTaskActionMenu();
+            showToast(`已删除任务：${taskName}`);
         }
 
         function openAddTaskModal() {
