@@ -2854,17 +2854,16 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.2.1 <span style="color: var(--success);">最新</span></p>
+                    <p>版本：v3.2.2 <span style="color: var(--success);">最新</span></p>
                     <p>更新日期：2026-04-11</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.1 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.2 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>修复Service Worker缓存导致页面无法更新问题</li>
-                            <li>改用网络优先策略，确保获取最新版本</li>
-                            <li>新增版本更新提示功能</li>
-                            <li>优化离线访问体验</li>
+                            <li>修复任务重复生成问题</li>
+                            <li>删除冗余的默认任务逻辑</li>
+                            <li>统一使用时间块任务管理</li>
                         </ul>
                     </div>
                 </div>
@@ -4290,35 +4289,8 @@
             const todayTasks = appData.tasks.filter(t => t.date === today);
             renderTaskList(todayTasks);
             
-            // 如果没有今日任务，添加默认任务
-            if (todayTasks.length === 0) {
-                addDefaultTasks();
-            }
-        }
-
-        function addDefaultTasks() {
-            const today = getTodayString();
-            const defaultTasks = [
-                { name: '公共基础-政治模块', category: '公共基础知识', duration: 120, priority: 'high' },
-                { name: '公共基础-法律模块', category: '公共基础知识', duration: 120, priority: 'high' },
-                { name: '三农综合写作-题目练习', category: '三农综合写作', duration: 120, priority: 'medium' },
-                { name: '行测-数量关系', category: '行测', duration: 60, priority: 'medium' },
-                { name: '技能提升-新媒体运营', category: '技能提升', duration: 180, priority: 'low' }
-            ];
-
-            defaultTasks.forEach(task => {
-                appData.tasks.push({
-                    id: generateId(),
-                    ...task,
-                    date: today,
-                    status: 'pending',
-                    actualDuration: 0,
-                    createdAt: Date.now()
-                });
-            });
-
-            saveData();
-            loadTasks();
+            // 注：任务生成由 generateDailyTasks() 和 checkDailyTaskUpdate() 统一处理
+            // 不再使用 addDefaultTasks()，避免与时间块任务重复
         }
 
         function renderTaskList(tasks) {
