@@ -2854,17 +2854,17 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.2.0 <span style="color: var(--success);">最新</span></p>
+                    <p>版本：v3.2.1 <span style="color: var(--success);">最新</span></p>
                     <p>更新日期：2026-04-11</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.0 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.1 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>新增每日6点自动更新今日任务</li>
-                            <li>自动清理昨日的自动生成任务</li>
-                            <li>页面长时间打开时支持定时刷新</li>
-                            <li>修复周计划日期显示问题</li>
+                            <li>修复Service Worker缓存导致页面无法更新问题</li>
+                            <li>改用网络优先策略，确保获取最新版本</li>
+                            <li>新增版本更新提示功能</li>
+                            <li>优化离线访问体验</li>
                         </ul>
                     </div>
                 </div>
@@ -3732,6 +3732,9 @@
             // 恢复计时状态
             restoreTimerState();
             
+            // 检测 Service Worker 更新
+            checkServiceWorkerUpdate();
+            
             // 页面卸载前保存计时状态
             window.addEventListener('beforeunload', function() {
                 if (timerState.isRunning) {
@@ -3741,6 +3744,67 @@
                 }
             });
         });
+        
+        // ============ Service Worker 更新检测 ============
+        function checkServiceWorkerUpdate() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then((registration) => {
+                    // 检测是否有新版本
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // 有新版本可用，提示用户刷新
+                                showUpdateNotification();
+                            }
+                        });
+                    });
+                    
+                    // 手动检查更新
+                    registration.update().catch(() => {});
+                });
+                
+                // 监听控制器变化（新版本激活）
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    window.location.reload();
+                });
+            }
+        }
+        
+        function showUpdateNotification() {
+            // 创建更新提示
+            const notification = document.createElement('div');
+            notification.id = 'updateNotification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #4A9FF5, #3A8FE5);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 25px;
+                box-shadow: 0 4px 20px rgba(74, 159, 245, 0.3);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 14px;
+                animation: slideDown 0.3s ease;
+            `;
+            notification.innerHTML = `
+                <span>🔄 发现新版本</span>
+                <button onclick="location.reload()" style="background: white; color: #4A9FF5; border: none; padding: 6px 16px; border-radius: 15px; cursor: pointer; font-weight: 500;">立即更新</button>
+                <button onclick="this.parentElement.remove()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer;">稍后</button>
+            `;
+            document.body.appendChild(notification);
+            
+            // 10秒后自动关闭
+            setTimeout(() => {
+                const el = document.getElementById('updateNotification');
+                if (el) el.remove();
+            }, 10000);
+        }
         
         // 活动追踪 - 用于打断检测
         function initActivityTracking() {
