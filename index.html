@@ -2854,18 +2854,17 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.1.1 <span style="color: var(--success);">最新</span></p>
-                    <p>更新日期：2026-04-10</p>
+                    <p>版本：v3.2.0 <span style="color: var(--success);">最新</span></p>
+                    <p>更新日期：2026-04-11</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.1.1 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.0 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>修复自动保存时计时器重置问题</li>
-                            <li>自动保存改为后台运行（不影响计时显示）</li>
-                            <li>每10分钟自动保存进度</li>
-                            <li>切换任务时自动保存当前进度</li>
-                            <li>碎片化计时支持（同一任务多次累计）</li>
+                            <li>新增每日6点自动更新今日任务</li>
+                            <li>自动清理昨日的自动生成任务</li>
+                            <li>页面长时间打开时支持定时刷新</li>
+                            <li>修复周计划日期显示问题</li>
                         </ul>
                     </div>
                 </div>
@@ -3343,6 +3342,92 @@
             lastAutoSaveTime: null     // 上次自动保存的时间点
         };
         
+        // ============ 每日任务自动更新机制 ============
+        const LAST_VISIT_KEY = 'studyPlanLastVisitDate';
+        
+        function checkDailyTaskUpdate() {
+            const now = new Date();
+            const today = getTodayString();
+            const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
+            
+            // 计算今天6点的时间戳
+            const today6AM = new Date(now);
+            today6AM.setHours(6, 0, 0, 0);
+            
+            // 情况1: 首次访问
+            if (!lastVisit) {
+                console.log('[每日更新] 首次访问，生成今日任务');
+                generateDailyTasks();
+                localStorage.setItem(LAST_VISIT_KEY, today);
+                return;
+            }
+            
+            // 情况2: 换天了（最后访问日期 != 今天）
+            if (lastVisit !== today) {
+                // 如果当前时间 >= 6点，说明已经过了更新时间
+                if (now >= today6AM) {
+                    console.log('[每日更新] 新的一天，重新生成今日任务');
+                    // 清除昨天的自动任务
+                    clearYesterdayAutoTasks(lastVisit);
+                    generateDailyTasks();
+                    localStorage.setItem(LAST_VISIT_KEY, today);
+                } else {
+                    // 当前时间在0点-6点之间，还是按昨天的任务
+                    console.log('[每日更新] 当前时间在6点前，保持昨日任务');
+                }
+                return;
+            }
+            
+            // 情况3: 同一天内再次访问
+            console.log('[每日更新] 同一天内访问，不重新生成任务');
+        }
+        
+        function clearYesterdayAutoTasks(yesterdayDate) {
+            // 清除昨天的自动生成任务（保留手动添加的任务）
+            appData.tasks = appData.tasks.filter(t => {
+                if (t.date === yesterdayDate && t.type === 'auto') {
+                    return false;
+                }
+                return true;
+            });
+            saveData();
+        }
+        
+        // 设置6点自动刷新检查（用于页面长时间打开的情况）
+        function schedule6AMRefresh() {
+            const now = new Date();
+            const today6AM = new Date(now);
+            today6AM.setHours(6, 0, 0, 0);
+            
+            let next6AM = today6AM;
+            if (now >= today6AM) {
+                // 如果已经过了今天6点，设置明天6点
+                next6AM.setDate(next6AM.getDate() + 1);
+            }
+            
+            const delay = next6AM.getTime() - now.getTime();
+            console.log(`[每日更新] 将在 ${next6AM.toLocaleString()} 自动刷新任务`);
+            
+            setTimeout(() => {
+                console.log('[每日更新] 6点到了，自动刷新任务');
+                const today = getTodayString();
+                clearYesterdayAutoTasks(getYesterdayString());
+                generateDailyTasks();
+                localStorage.setItem(LAST_VISIT_KEY, today);
+                loadTasks();
+                updateOverview();
+                
+                // 设置下一次刷新
+                schedule6AMRefresh();
+            }, delay);
+        }
+        
+        function getYesterdayString() {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            return yesterday.toISOString().split('T')[0];
+        }
+        
         // ============ 计时状态持久化 ============
         const TIMER_STATE_KEY = 'studyPlanTimerState';
         
@@ -3632,8 +3717,11 @@
             loadGoals();
             initReminder();
             
-            // 智能任务生成
-            generateDailyTasks();
+            // 每日任务自动更新（检查是否需要生成新任务）
+            checkDailyTaskUpdate();
+            
+            // 设置6点自动刷新
+            schedule6AMRefresh();
             
             // 检查是否需要结束学习提醒
             checkEndDayReminder();
