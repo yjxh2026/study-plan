@@ -2840,6 +2840,10 @@
                         导入数据
                     </button>
                     <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(event)">
+                    <button class="btn btn-outline" onclick="regenerateTodayCourseTasks()" style="color: var(--primary);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                        恢复课程任务
+                    </button>
                     <button class="btn btn-outline" onclick="confirmClearData()" style="color: var(--danger);">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                         清空数据
@@ -2854,16 +2858,17 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.2.3 <span style="color: var(--success);">最新</span></p>
+                    <p>版本：v3.3.0 <span style="color: var(--success);">最新</span></p>
                     <p>更新日期：2026-04-11</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.2.3 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.3.0 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>新增任务删除功能</li>
-                            <li>点击任务卡片可弹出操作菜单</li>
-                            <li>支持删除重复或不需要的任务</li>
+                            <li>新增课程任务自动恢复功能</li>
+                            <li>删除课程任务后自动检测并补充</li>
+                            <li>设置页面新增"恢复课程任务"按钮</li>
+                            <li>页面加载时自动同步课程表</li>
                         </ul>
                     </div>
                 </div>
@@ -3723,6 +3728,9 @@
             // 每日任务自动更新（检查是否需要生成新任务）
             checkDailyTaskUpdate();
             
+            // 自动同步课程任务（恢复被删除的课程任务）
+            syncCourseTasks();
+            
             // 设置6点自动刷新
             schedule6AMRefresh();
             
@@ -3895,42 +3903,6 @@
                 });
             }
             
-            // 3. 如果有课程，添加课前预习和课程本身
-            if (hasCourseToday) {
-                todayCourses.forEach(course => {
-                    // 课前预习
-                    newTasks.push({
-                        id: generateId(),
-                        name: `课前预习 - ${course.name}`,
-                        category: '公共基础知识',
-                        date: today,
-                        startTime: '17:30',
-                        endTime: '18:30',
-                        duration: 60,
-                        priority: 'high',
-                        type: 'auto',
-                        relatedCourseId: course.id,
-                        completed: false
-                    });
-                    
-                    // 课程本身（特殊类型，不可勾选）
-                    newTasks.push({
-                        id: generateId(),
-                        name: `📚 ${course.name}`,
-                        category: '线上课程',
-                        date: today,
-                        startTime: course.time || '18:30',
-                        endTime: addHours(course.time || '18:30', course.duration || 2),
-                        duration: (course.duration || 2) * 60,
-                        priority: 'high',
-                        type: 'course',
-                        relatedCourseId: course.id,
-                        completed: false,
-                        attendance: 'pending' // pending, attended, absent
-                    });
-                });
-            }
-            
             // 4. 每日复盘
             newTasks.push({
                 id: generateId(),
@@ -3974,6 +3946,42 @@
                 });
             }
             
+            // 6. 如果有课程，添加课前预习和课程本身
+            if (hasCourseToday) {
+                todayCourses.forEach(course => {
+                    // 课前预习
+                    newTasks.push({
+                        id: generateId(),
+                        name: `课前预习 - ${course.name}`,
+                        category: '公共基础知识',
+                        date: today,
+                        startTime: '17:30',
+                        endTime: '18:30',
+                        duration: 60,
+                        priority: 'high',
+                        type: 'auto',
+                        relatedCourseId: course.id,
+                        completed: false
+                    });
+                    
+                    // 课程本身（特殊类型，不可勾选）
+                    newTasks.push({
+                        id: generateId(),
+                        name: `📚 ${course.name}`,
+                        category: '线上课程',
+                        date: today,
+                        startTime: course.time || '18:30',
+                        endTime: addHours(course.time || '18:30', course.duration || 2),
+                        duration: (course.duration || 2) * 60,
+                        priority: 'high',
+                        type: 'course',
+                        relatedCourseId: course.id,
+                        completed: false,
+                        attendance: 'pending' // pending, attended, absent
+                    });
+                });
+            }
+            
             // 添加新任务
             newTasks.forEach(task => {
                 appData.tasks.push(task);
@@ -3981,6 +3989,73 @@
             
             saveData();
             loadTasks();
+        }
+        
+        // ============ 课程任务同步（自动恢复被删除的课程任务）============
+        function syncCourseTasks() {
+            const today = getTodayString();
+            const todayCourses = appData.courses.filter(c => c.date === today);
+            
+            if (todayCourses.length === 0) return;
+            
+            const todayTasks = appData.tasks.filter(t => t.date === today);
+            let addedCount = 0;
+            
+            todayCourses.forEach(course => {
+                // 检查是否存在该课程的任务
+                const courseTaskExists = todayTasks.some(t => 
+                    t.type === 'course' && t.relatedCourseId === course.id
+                );
+                
+                // 如果课程任务不存在，重新添加
+                if (!courseTaskExists) {
+                    // 添加课前预习
+                    appData.tasks.push({
+                        id: generateId(),
+                        name: `课前预习 - ${course.name}`,
+                        category: '公共基础知识',
+                        date: today,
+                        startTime: '17:30',
+                        endTime: '18:30',
+                        duration: 60,
+                        priority: 'high',
+                        type: 'auto',
+                        relatedCourseId: course.id,
+                        completed: false
+                    });
+                    
+                    // 添加课程任务
+                    appData.tasks.push({
+                        id: generateId(),
+                        name: `📚 ${course.name}`,
+                        category: '线上课程',
+                        date: today,
+                        startTime: course.time || '18:30',
+                        endTime: addHours(course.time || '18:30', course.duration || 2),
+                        duration: (course.duration || 2) * 60,
+                        priority: 'high',
+                        type: 'course',
+                        relatedCourseId: course.id,
+                        completed: false,
+                        attendance: 'pending'
+                    });
+                    
+                    addedCount++;
+                }
+            });
+            
+            if (addedCount > 0) {
+                saveData();
+                loadTasks();
+                updateOverview();
+                console.log(`[课程同步] 已恢复 ${addedCount} 个课程任务`);
+            }
+        }
+        
+        // 手动重新生成今日课程任务
+        function regenerateTodayCourseTasks() {
+            syncCourseTasks();
+            showToast('已检查并补充今日课程任务');
         }
 
         // ============ 导航功能 ============
