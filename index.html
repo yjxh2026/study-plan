@@ -2858,17 +2858,15 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.3.0 <span style="color: var(--success);">最新</span></p>
-                    <p>更新日期：2026-04-11</p>
+                    <p>版本：v3.3.1 <span style="color: var(--success);">最新</span></p>
+                    <p>更新日期：2026-04-12</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.3.0 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.3.1 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>新增课程任务自动恢复功能</li>
-                            <li>删除课程任务后自动检测并补充</li>
-                            <li>设置页面新增"恢复课程任务"按钮</li>
-                            <li>页面加载时自动同步课程表</li>
+                            <li>修复计时进度与自动保存重复累加的问题</li>
+                            <li>暂停计时现在只保存增量时间，避免双重计算</li>
                         </ul>
                     </div>
                 </div>
@@ -4711,7 +4709,10 @@
             if (save && timerState.currentTaskId) {
                 const task = appData.tasks.find(t => t.id === timerState.currentTaskId);
                 if (task) {
-                    const sessionDuration = Math.floor(timerState.elapsedTime / 1000);
+                    // 修复：只保存从上次自动保存之后的增量时长，避免与自动保存重复累加
+                    const now = Date.now();
+                    const lastSaveTime = timerState.lastAutoSaveTime || timerState.startTime;
+                    const sessionDuration = Math.floor((now - lastSaveTime) / 1000);
                     
                     // 只有超过5秒才保存（避免误触）
                     if (sessionDuration >= 5) {
