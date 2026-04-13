@@ -2858,15 +2858,16 @@
                 </div>
                 <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
                     <p><strong>学习时间规划</strong></p>
-                    <p>版本：v3.3.1 <span style="color: var(--success);">最新</span></p>
-                    <p>更新日期：2026-04-12</p>
+                    <p>版本：v3.3.2 <span style="color: var(--success);">最新</span></p>
+                    <p>更新日期：2026-04-13</p>
                     <p>专为山东省三支一扶考试备考设计</p>
                     <p style="margin-top: 12px;">功能：任务管理、计时追踪、数据统计、学习复盘、圆环进度、打断处理</p>
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.3.1 更新内容：</p>
+                        <p style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">v3.3.2 更新内容：</p>
                         <ul style="padding-left: 16px; font-size: 12px;">
-                            <li>修复计时进度与自动保存重复累加的问题</li>
-                            <li>暂停计时现在只保存增量时间，避免双重计算</li>
+                            <li>修复结束计时后计时器不重新计时的问题</li>
+                            <li>修复任务进度在不计时阶段自动叠加的问题</li>
+                            <li>结束计时后完全重置计时状态</li>
                         </ul>
                     </div>
                 </div>
@@ -4724,14 +4725,27 @@
                         saveData();
                         updateOverview();
                         
-                        // 清除保存的计时状态
+                        // 完全重置计时状态（内存 + localStorage）
                         clearTimerState();
+                        timerState.elapsedTime = 0;
+                        timerState.startTime = null;
+                        timerState.currentTaskId = null;
+                        timerState.lastAutoSaveTime = null;
+                        
+                        // 重置计时器显示
+                        document.getElementById('timerDisplay').textContent = '00:00:00';
+                        document.getElementById('timerTaskName').textContent = '点击任务开始计时';
+                        document.getElementById('playIcon').style.display = 'block';
+                        document.getElementById('pauseIcon').style.display = 'none';
                         
                         // 显示计时结束弹窗
                         showTimerEndModal(sessionDuration);
                     } else {
                         showToast('计时时间太短，未保存');
                         clearTimerState();
+                        timerState.elapsedTime = 0;
+                        timerState.startTime = null;
+                        timerState.currentTaskId = null;
                     }
                 }
             }
